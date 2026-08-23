@@ -1,0 +1,9 @@
+{
+"name":"RoadBook — Анапа → Екатеринбург",
+"short_name":"RoadBook",
+"start_url":"./index.html",
+"display":"standalone",
+"background_color":"#f5f7fb",
+"theme_color":"#0b3d91",
+"lang":"ru"
+}
