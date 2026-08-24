@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d91">
 <link rel="manifest" href="manifest.webmanifest">
-<title>RoadBook</title>
+<title>RoadBook v0.5</title>
 <style>
 :root{--b:#0b3d91;--g:#0b8f45;--bg:#f5f7fb;--t:#142033;--m:#687386;--l:#e2e7ef}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--t)}
@@ -15,9 +15,11 @@ header{background:linear-gradient(145deg,#073274,#1262bf);color:#fff;padding:cal
 main{padding:16px}.card{background:#fff;border:1px solid var(--l);border-radius:22px;padding:17px;margin-bottom:14px;box-shadow:0 4px 14px #102a430d}
 .current{display:flex;justify-content:space-between;gap:12px}.pin{font-size:30px}.place{font-size:23px;font-weight:800}.muted{color:var(--m);font-size:14px;margin-top:4px}
 .big{width:100%;border:0;border-radius:19px;padding:18px;background:var(--g);color:#fff;font-size:19px;font-weight:800}.big small{font-weight:500}
+.secondary{width:100%;border:0;border-radius:16px;padding:13px;background:#e8f3ff;color:#0b3d91;font-size:16px;font-weight:800;margin-top:10px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.action{border:0;border-radius:19px;padding:20px 10px;font-size:17px;font-weight:800;min-height:105px}.action span{display:block;font-size:32px;margin-bottom:8px}.fuel{background:#e6faec}.expense{background:#fff0e7}.stop{background:#e8f3ff}.note{background:#f2eaff}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}.stats b{display:block;font-size:19px;margin-top:5px}.stats small{color:var(--m)}
 .sync{background:#e7faee;color:#075b2f}.sync b{display:block}.sync span{font-size:13px}
+.stage{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--l)}.stage:last-child{border-bottom:0}.stage .n{width:32px;height:32px;border-radius:50%;background:#e8f3ff;color:#0b3d91;display:flex;align-items:center;justify-content:center;font-weight:800}.stage.active .n{background:var(--g);color:#fff}.stage b{display:block}.stage small{color:var(--m)}
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);padding:10px 8px calc(10px + env(safe-area-inset-bottom));background:#ffffffef;backdrop-filter:blur(14px);border-top:1px solid var(--l);display:grid;grid-template-columns:repeat(4,1fr);z-index:10}
 nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav button b{display:block;font-size:22px;margin-bottom:3px}
 .modal-back{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal-back.show{display:flex}
@@ -30,113 +32,116 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <body>
 <div class="app">
 <header><div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
-<div class="route">Анапа → Екатеринбург</div><div class="sub">3 010 км · поездка №1</div></header>
+<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.5</div></header>
 <main>
-<section class="card current"><div><div class="pin">📍</div><div class="place">Краснодар</div><div class="muted">Следующая точка · 186 км</div></div>
-<div style="text-align:right"><div class="muted">Осталось</div><strong>2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
-<button class="big" id="routeBtn">🧭 ПРОДОЛЖИТЬ МАРШРУТ<br><small>Открыть следующую точку в Яндекс Картах</small></button>
+<section class="card current"><div><div class="pin">📍</div><div class="place" id="nextName">Краснодар</div><div class="muted" id="nextInfo">Следующая точка маршрута</div></div>
+<div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
+
+<button class="big" id="navBtn">🧭 НАВИГАТОР<br><small>Открыть маршрут в Яндекс Навигаторе</small></button>
+<button class="secondary" id="nextBtn">➡️ Следующая точка маршрута</button>
+
+<section class="card"><b>🛣 Маршрут поездки</b><div id="stages"></div></section>
+
 <div class="grid">
 <button class="action fuel" id="fuelBtn"><span>⛽</span>ЗАПРАВКА</button>
 <button class="action expense" id="expenseBtn"><span>🍔</span>РАСХОД</button>
 <button class="action stop" id="stopBtn"><span>📍</span>ОСТАНОВКА</button>
 <button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button></div>
-<section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b>2 824 км</b></div></section>
-<section class="card sync"><b>☁️ Данные сохраняются локально</b><span id="syncText">Можно работать без интернета. Записей: 0</span></section>
+
+<section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
+<section class="card sync"><b>☁️ Локальное сохранение</b><span id="syncText">Можно записывать расходы без интернета.</span></section>
 <section class="card"><b>📋 Последние записи</b><div id="records" class="empty">Пока записей нет</div></section>
 </main>
-<nav><button id="homeBtn"><b>⌂</b>Главная</button><button id="mapBtn"><b>⌁</b>Карта</button><button id="journalBtn"><b>☷</b>Журнал</button><button id="moreBtn"><b>⚙</b>Ещё</button></nav>
+<nav><button id="homeBtn"><b>⌂</b>Главная</button><button id="mapBtn"><b>⌁</b>Навигатор</button><button id="journalBtn"><b>☷</b>Журнал</button><button id="moreBtn"><b>⚙</b>Ещё</button></nav>
 </div>
-
-<div class="modal-back" id="modalBack">
-  <div class="modal" id="modal"></div>
-</div>
+<div class="modal-back" id="modalBack"><div class="modal" id="modal"></div></div>
 
 <script>
 (function(){
 'use strict';
-const KEY='roadbook_v041_records';
-let records=[];
+
+const KEY='roadbook_v05_records';
+const STAGE_KEY='roadbook_v05_stage';
+const stages=[
+  {name:'Краснодар',lat:45.03547,lon:38.97531,km:186},
+  {name:'Кропоткин',lat:45.4375,lon:40.5756,km:170},
+  {name:'Волгоград',lat:48.7080,lon:44.5133,km:650},
+  {name:'Саратов',lat:51.5336,lon:46.0343,km:390},
+  {name:'Самара',lat:53.1959,lon:50.1008,km:430},
+  {name:'Уфа',lat:54.7388,lon:55.9721,km:470},
+  {name:'Челябинск',lat:55.1644,lon:61.4368,km:430},
+  {name:'Екатеринбург',lat:56.8389,lon:60.6057,km:210}
+];
+
+let records=[]; let stage=0;
 try{records=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){records=[]}
+try{stage=Math.max(0,Math.min(stages.length-1,Number(localStorage.getItem(STAGE_KEY)||0)))}catch(e){stage=0}
 
-const modalBack=document.getElementById('modalBack');
-const modal=document.getElementById('modal');
-
+const modalBack=document.getElementById('modalBack'), modal=document.getElementById('modal');
 function v(id){const e=document.getElementById(id);return e?(e.value||'').trim():''}
 function n(id){return Number(v(id).replace(',','.'))||0}
-function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(records))}catch(e){}
-  render();
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(records));localStorage.setItem(STAGE_KEY,String(stage))}catch(e){}render()}
+function render(){
+  let spent=0; records.forEach(r=>spent+=Number(r.sum||r.amount||0));
+  const s=Math.round(spent).toLocaleString('ru-RU')+' ₽';
+  document.getElementById('spent').textContent=s; document.getElementById('spent2').textContent=s;
+  const st=stages[stage]; document.getElementById('nextName').textContent=st.name;
+  document.getElementById('nextInfo').textContent=stage===stages.length-1?'Финиш маршрута':'Следующая точка · ориентир '+st.km+' км';
+  let rem=stages.slice(stage).reduce((a,x)=>a+x.km,0);
+  document.getElementById('remaining').textContent=rem.toLocaleString('ru-RU')+' км';
+  document.getElementById('remaining2').textContent=rem.toLocaleString('ru-RU')+' км';
+  document.getElementById('syncText').textContent='Записей на iPhone: '+records.length+'. Интернет для ввода не нужен.';
+  document.getElementById('stages').innerHTML=stages.map((x,i)=>'<div class="stage '+(i===stage?'active':'')+'"><div class="n">'+(i+1)+'</div><div><b>'+x.name+(i===stage?' · СЛЕДУЮЩАЯ':'')+'</b><small>ориентир '+x.km+' км</small></div></div>').join('');
+  const box=document.getElementById('records');
+  if(!records.length){box.className='empty';box.textContent='Пока записей нет'}else{
+    box.className='';
+    box.innerHTML=records.slice(0,5).map(r=>{let t=r.type==='fuel'?'⛽ '+r.fuel+' · '+Math.round(r.sum)+' ₽':r.type==='expense'?'🍔 '+r.category+' · '+Math.round(r.amount)+' ₽':r.type==='stop'?'📍 '+r.place:'📝 '+r.comment;return '<div style="padding:11px 0;border-bottom:1px solid var(--l)">'+t+'<div class="muted">'+new Date(r.time).toLocaleString('ru-RU')+'</div></div>'}).join('');
+  }
 }
 function openForm(type){
-  let title='',body='';
-  if(type==='fuel'){
-    title='⛽ Новая заправка';
-    body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div>'+
-    '<div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="38,5"></div>'+
-    '<div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div>'+
-    '<div class="field"><label>Где</label><input id="place" placeholder="Краснодар"></div>';
-  } else if(type==='expense'){
-    title='🍔 Новый расход';
-    body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div>'+
-    '<div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div>'+
-    '<div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'+
-    '<div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>';
-  } else if(type==='stop'){
-    title='📍 Новая остановка';
-    body='<div class="field"><label>Где</label><input id="place" placeholder="Краснодар"></div>'+
-    '<div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div>'+
-    '<div class="field"><label>Комментарий</label><textarea id="comment" rows="3"></textarea></div>';
-  } else {
-    title='📝 Новая заметка';
-    body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>';
-  }
-  modal.innerHTML='<h2>'+title+'</h2>'+body+
-  '<div class="modal-actions"><button class="cancel" id="cancelBtn">Отмена</button><button class="save" id="saveBtn">Сохранить</button></div>';
-  modalBack.classList.add('show');
-  document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('saveBtn').addEventListener('click',function(){submitForm(type)});
+ let title='',body='';
+ if(type==='fuel'){title='⛽ Новая заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="38,5"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
+ else if(type==='expense'){title='🍔 Новый расход';body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div><div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div><div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>'}
+ else if(type==='stop'){title='📍 Новая остановка';body='<div class="field"><label>Где</label><input id="place" placeholder="Волгоград"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>Комментарий</label><textarea id="comment" rows="3"></textarea></div>'}
+ else{title='📝 Новая заметка';body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>'}
+ modal.innerHTML='<h2>'+title+'</h2>'+body+'<div class="modal-actions"><button class="cancel" id="cancelBtn">Отмена</button><button class="save" id="saveBtn">Сохранить</button></div>';
+ modalBack.classList.add('show');
+ document.getElementById('cancelBtn').onclick=closeModal; document.getElementById('saveBtn').onclick=function(){submitForm(type)};
 }
 function closeModal(){modalBack.classList.remove('show');modal.innerHTML=''}
 function submitForm(type){
-  const r={type:type,time:new Date().toISOString()};
-  if(type==='fuel'){r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place')}
-  if(type==='expense'){r.category=v('category');r.amount=n('amount');r.place=v('place');r.comment=v('comment')}
-  if(type==='stop'){r.place=v('place');r.odo=n('odo');r.comment=v('comment')}
-  if(type==='note'){r.comment=v('comment')}
-  records.unshift(r);save();closeModal();
+ let r={type:type,time:new Date().toISOString()};
+ if(type==='fuel'){r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place')}
+ if(type==='expense'){r.category=v('category');r.amount=n('amount');r.place=v('place');r.comment=v('comment')}
+ if(type==='stop'){r.place=v('place');r.odo=n('odo');r.comment=v('comment')}
+ if(type==='note')r.comment=v('comment');
+ records.unshift(r);persist();closeModal();
 }
-function render(){
-  let spent=0;
-  records.forEach(r=>spent+=Number(r.sum||r.amount||0));
-  const text=Math.round(spent).toLocaleString('ru-RU')+' ₽';
-  document.getElementById('spent').textContent=text;
-  document.getElementById('spent2').textContent=text;
-  document.getElementById('syncText').textContent='Можно работать без интернета. Записей: '+records.length;
-  const box=document.getElementById('records');
-  if(!records.length){box.className='empty';box.textContent='Пока записей нет';return}
-  box.className='';
-  box.innerHTML=records.slice(0,5).map(function(r){
-    let t=r.type==='fuel'?'⛽ '+r.fuel+' · '+Math.round(r.sum)+' ₽':
-      r.type==='expense'?'🍔 '+r.category+' · '+Math.round(r.amount)+' ₽':
-      r.type==='stop'?'📍 '+r.place:'📝 '+r.comment;
-    return '<div style="padding:11px 0;border-bottom:1px solid var(--l)">'+t+'<div class="muted">'+new Date(r.time).toLocaleString('ru-RU')+'</div></div>';
-  }).join('');
+function openNavigator(){
+  const s=stages[stage];
+  // Открываем официальный URL-схему Яндекс Навигатора.
+  // Только конечная точка — Навигатор сам использует текущее местоположение.
+  const url='yandexnavi://build_route_on_map?lat_to='+s.lat+'&lon_to='+s.lon;
+  window.location.href=url;
+  setTimeout(function(){
+    // Если приложение не установлено/не открылось — резервно открываем Яндекс Карты.
+    window.location.href='https://yandex.ru/maps/?rtext='+encodeURIComponent(s.name)+'&rtt=auto';
+  },1200);
 }
-function openYandex(){window.location.href='https://yandex.ru/maps/?rtext=Краснодар&rtt=auto'}
-document.getElementById('fuelBtn').addEventListener('click',function(){openForm('fuel')});
-document.getElementById('expenseBtn').addEventListener('click',function(){openForm('expense')});
-document.getElementById('stopBtn').addEventListener('click',function(){openForm('stop')});
-document.getElementById('noteBtn').addEventListener('click',function(){openForm('note')});
-document.getElementById('routeBtn').addEventListener('click',openYandex);
-document.getElementById('mapBtn').addEventListener('click',openYandex);
-document.getElementById('journalBtn').addEventListener('click',function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})});
-document.getElementById('homeBtn').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
-document.getElementById('moreBtn').addEventListener('click',function(){alert('RoadBook v0.4.1\\n\\nЗаправки, расходы, остановки и заметки сохраняются на iPhone.\\nИнтернет для записи не нужен.')});
-window.addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
-window.addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
-modalBack.addEventListener('click',function(e){if(e.target===modalBack)closeModal()});
+document.getElementById('navBtn').onclick=openNavigator;
+document.getElementById('mapBtn').onclick=openNavigator;
+document.getElementById('nextBtn').onclick=function(){if(stage<stages.length-1){stage++;persist()}};
+document.getElementById('fuelBtn').onclick=function(){openForm('fuel')};
+document.getElementById('expenseBtn').onclick=function(){openForm('expense')};
+document.getElementById('stopBtn').onclick=function(){openForm('stop')};
+document.getElementById('noteBtn').onclick=function(){openForm('note')};
+document.getElementById('journalBtn').onclick=function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})};
+document.getElementById('homeBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.5\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
+modalBack.onclick=function(e){if(e.target===modalBack)closeModal()};
+addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
+addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
 render();
 })();
 </script>
-</body>
-</html>
+</body></html>
