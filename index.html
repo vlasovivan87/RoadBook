@@ -27,7 +27,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 .field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:13px;border:1px solid var(--l);border-radius:12px;font-size:16px;background:#fff}
 .modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1;padding:14px;border-radius:13px;border:0;font-weight:700;font-size:16px}.save{background:var(--g);color:#fff}.cancel{background:#eef1f5}
 .empty{color:var(--m);text-align:center;padding:20px}
-.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}</style>
+.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}.gasfinish{background:#fff1f0!important;color:#a61b1b!important;border:1px solid #f3c7c3!important}</style>
 </head>
 <body>
 <div class="app">
@@ -48,7 +48,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <button class="action stop" id="stopBtn"><span>📍</span>ОСТАНОВКА</button>
 <button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button></div>
 
-<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
+<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button><button class="fuelbtn gasfinish" id="gasFinishedBtn">⚠️ Газ закончился</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
 <section class="card sync"><b>☁️ Локальное сохранение</b><span id="syncText">Можно записывать расходы без интернета.</span></section>
 <section class="card"><b>📋 Последние записи</b><div id="records" class="empty">Пока записей нет</div></section>
 </main>
@@ -115,7 +115,7 @@ function render(){
 }
 function openForm(type){
  let title='',body='';
- if(type==='fuel'){title='⛽ Заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="35"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>До заправки закончилось?</label><select id="empty"><option value="unknown">Не знаю</option><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Заправка до полного?</label><select id="full"><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
+ if(type==='fuel'){title='⛽ Заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="35"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>Заправка до полного?</label><select id="full"><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
  else if(type==='expense'){title='🍔 Новый расход';body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div><div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div><div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>'}
  else if(type==='stop'){title='📍 Новая остановка';body='<div class="field"><label>Где</label><input id="place" placeholder="Волгоград"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>Комментарий</label><textarea id="comment" rows="3"></textarea></div>'}
  else{title='📝 Новая заметка';body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>'}
@@ -127,7 +127,7 @@ function closeModal(){modalBack.classList.remove('show');modal.innerHTML=''}
 function submitForm(type){
  let r={type:type,time:new Date().toISOString()};
  if(type==='fuel'){
-r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place');r.odo=n('odo');r.empty=v('empty');r.full=v('full');
+r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place');r.odo=n('odo');r.empty='no';r.full=v('full');
 const gas=r.fuel==='Газ'; const oldOdo=gas?fuel.lastGasOdo:fuel.lastPetrolOdo;
 if(r.odo>0 && oldOdo!=null && r.odo>oldOdo && r.empty==='yes'){
  const rate=r.liters/(r.odo-oldOdo)*100;
@@ -143,6 +143,25 @@ saveFuel();
  if(type==='note')r.comment=v('comment');
  records.unshift(r);persist();closeModal();
 }
+
+function gasFinished(){
+  const km=prompt('Сколько км проехал на газе после последней заправки?','');
+  if(km===null)return;
+  const distance=parseFloat(String(km).replace(',','.'));
+  if(!isFinite(distance)||distance<=0){alert('Введи корректное расстояние в километрах.');return;}
+  const liters=fuel.gasLeft;
+  let msg='Газ отмечен как законченный.\nПроехано: '+distance.toFixed(1)+' км.';
+  if(liters!=null&&liters>0){
+    const rate=liters/distance*100;
+    if(rate>3&&rate<30){fuel.gasRate=rate;msg+='\nРасход: '+rate.toFixed(1)+' л/100 км.';}
+  }
+  fuel.gasLeft=0;
+  fuel.gasFinishedDistance=distance;
+  fuel.lastGasFinishedAt=Date.now();
+  saveFuel(); render();
+  alert(msg+'\n\nТеперь можно ехать на бензине до следующей АГЗС.');
+}
+
 function openNavigator(){
   const s=stages[stage];
   // Яндекс Навигатор строит маршрут от текущего местоположения
@@ -153,6 +172,7 @@ function openNavigator(){
 }
 document.getElementById('navBtn').onclick=openNavigator;
 document.getElementById('fuelStatusBtn').onclick=function(){openForm('fuel')};
+document.getElementById('gasFinishedBtn').onclick=gasFinished;
 document.getElementById('mapBtn').onclick=openNavigator;
 document.getElementById('nextBtn').onclick=function(){if(stage<stages.length-1){stage++;persist()}};
 document.getElementById('fuelBtn').onclick=function(){openForm('fuel')};
