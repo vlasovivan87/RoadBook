@@ -119,14 +119,11 @@ function submitForm(type){
 }
 function openNavigator(){
   const s=stages[stage];
-  // Открываем официальный URL-схему Яндекс Навигатора.
-  // Только конечная точка — Навигатор сам использует текущее местоположение.
-  const url='yandexnavi://build_route_on_map?lat_to='+s.lat+'&lon_to='+s.lon;
+  // Яндекс Навигатор строит маршрут от текущего местоположения
+  // до выбранной следующей точки. Никакого перехода в Карты
+  // после запуска больше нет.
+  const url='yandexnavi://build_route_on_map?lat_to='+encodeURIComponent(s.lat)+'&lon_to='+encodeURIComponent(s.lon);
   window.location.href=url;
-  setTimeout(function(){
-    // Если приложение не установлено/не открылось — резервно открываем Яндекс Карты.
-    window.location.href='https://yandex.ru/maps/?rtext='+encodeURIComponent(s.name)+'&rtt=auto';
-  },1200);
 }
 document.getElementById('navBtn').onclick=openNavigator;
 document.getElementById('mapBtn').onclick=openNavigator;
