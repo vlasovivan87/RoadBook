@@ -27,7 +27,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 .field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:13px;border:1px solid var(--l);border-radius:12px;font-size:16px;background:#fff}
 .modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1;padding:14px;border-radius:13px;border:0;font-weight:700;font-size:16px}.save{background:var(--g);color:#fff}.cancel{background:#eef1f5}
 .empty{color:var(--m);text-align:center;padding:20px}
-</style>
+.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}</style>
 </head>
 <body>
 <div class="app">
@@ -48,7 +48,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <button class="action stop" id="stopBtn"><span>📍</span>ОСТАНОВКА</button>
 <button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button></div>
 
-<section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
+<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
 <section class="card sync"><b>☁️ Локальное сохранение</b><span id="syncText">Можно записывать расходы без интернета.</span></section>
 <section class="card"><b>📋 Последние записи</b><div id="records" class="empty">Пока записей нет</div></section>
 </main>
@@ -75,7 +75,13 @@ const stages=[
 
 let records=[]; let stage=0;
 try{records=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){records=[]}
-try{stage=Math.max(0,Math.min(stages.length-1,Number(localStorage.getItem(STAGE_KEY)||0)))}catch(e){stage=0}
+try{stage=Math.max(0,Math.min(stages.length-1,Number(localStorage.getItem(STAGE_KEY)||0)))}catch(e){stage=0} 
+const FUEL_KEY='roadbook_v06_fuel';
+let fuel={gasLeft:null,petrolLeft:null,gasRate:null,petrolRate:null,lastGasOdo:null,lastPetrolOdo:null,gasTank:35,petrolTank:null};
+try{const x=JSON.parse(localStorage.getItem(FUEL_KEY)||'null');if(x)fuel=Object.assign(fuel,x)}catch(e){}
+function saveFuel(){try{localStorage.setItem(FUEL_KEY,JSON.stringify(fuel))}catch(e){}}
+function fuelRange(left,rate){return left!=null&&rate>0?Math.round(left/rate*100):null}
+
 
 const modalBack=document.getElementById('modalBack'), modal=document.getElementById('modal');
 function v(id){const e=document.getElementById(id);return e?(e.value||'').trim():''}
@@ -92,6 +98,15 @@ function render(){
   document.getElementById('remaining2').textContent=rem.toLocaleString('ru-RU')+' км';
   document.getElementById('syncText').textContent='Записей на iPhone: '+records.length+'. Интернет для ввода не нужен.';
   document.getElementById('stages').innerHTML=stages.map((x,i)=>'<div class="stage '+(i===stage?'active':'')+'"><div class="n">'+(i+1)+'</div><div><b>'+x.name+(i===stage?' · СЛЕДУЮЩАЯ':'')+'</b><small>ориентир '+x.km+' км</small></div></div>').join('');
+  const gr=fuelRange(fuel.gasLeft,fuel.gasRate), pr=fuelRange(fuel.petrolLeft,fuel.petrolRate);
+  document.getElementById('gasLeft').textContent=fuel.gasLeft==null?'—':fuel.gasLeft.toFixed(1)+' л';
+  document.getElementById('petrolLeft').textContent=fuel.petrolLeft==null?'—':fuel.petrolLeft.toFixed(1)+' л';
+  document.getElementById('gasRange').textContent=gr==null?'После первой полной заправки появится расчёт':'Запас ≈ '+gr+' км · '+fuel.gasRate.toFixed(1)+' л/100 км';
+  document.getElementById('petrolRange').textContent=pr==null?'Укажи объём при первой заправке':'Запас ≈ '+pr+' км · '+fuel.petrolRate.toFixed(1)+' л/100 км';
+  const fs=document.getElementById('fuelStatus');
+  if(gr!=null && gr<st.km){fs.className='muted fuelwarn';fs.textContent='🔴 Расчётного газа может не хватить до следующей точки.'}
+  else if(gr!=null){fs.className='muted fuelok';fs.textContent='🟢 Расчётного газа хватает до следующей точки.'}
+  else fs.className='muted';
   const box=document.getElementById('records');
   if(!records.length){box.className='empty';box.textContent='Пока записей нет'}else{
     box.className='';
@@ -100,7 +115,7 @@ function render(){
 }
 function openForm(type){
  let title='',body='';
- if(type==='fuel'){title='⛽ Новая заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="38,5"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
+ if(type==='fuel'){title='⛽ Заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="35"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>До заправки закончилось?</label><select id="empty"><option value="unknown">Не знаю</option><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Заправка до полного?</label><select id="full"><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
  else if(type==='expense'){title='🍔 Новый расход';body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div><div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div><div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>'}
  else if(type==='stop'){title='📍 Новая остановка';body='<div class="field"><label>Где</label><input id="place" placeholder="Волгоград"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>Комментарий</label><textarea id="comment" rows="3"></textarea></div>'}
  else{title='📝 Новая заметка';body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>'}
@@ -111,7 +126,18 @@ function openForm(type){
 function closeModal(){modalBack.classList.remove('show');modal.innerHTML=''}
 function submitForm(type){
  let r={type:type,time:new Date().toISOString()};
- if(type==='fuel'){r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place')}
+ if(type==='fuel'){
+r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place');r.odo=n('odo');r.empty=v('empty');r.full=v('full');
+const gas=r.fuel==='Газ'; const oldOdo=gas?fuel.lastGasOdo:fuel.lastPetrolOdo;
+if(r.odo>0 && oldOdo!=null && r.odo>oldOdo && r.empty==='yes'){
+ const rate=r.liters/(r.odo-oldOdo)*100;
+ if(rate>3&&rate<30){if(gas)fuel.gasRate=rate;else fuel.petrolRate=rate}
+}
+if(r.odo>0){if(gas)fuel.lastGasOdo=r.odo;else fuel.lastPetrolOdo=r.odo}
+if(gas){fuel.gasLeft=(r.full==='yes')?Math.min(35,r.liters):Math.min(35,(fuel.gasLeft||0)+r.liters);if(r.empty==='yes'&&r.full!=='yes')fuel.gasLeft=r.liters}
+else{if(r.full==='yes'){fuel.petrolTank=r.liters;fuel.petrolLeft=r.liters}else fuel.petrolLeft=(fuel.petrolLeft||0)+r.liters}
+saveFuel();
+}
  if(type==='expense'){r.category=v('category');r.amount=n('amount');r.place=v('place');r.comment=v('comment')}
  if(type==='stop'){r.place=v('place');r.odo=n('odo');r.comment=v('comment')}
  if(type==='note')r.comment=v('comment');
@@ -126,6 +152,7 @@ function openNavigator(){
   window.location.href=url;
 }
 document.getElementById('navBtn').onclick=openNavigator;
+document.getElementById('fuelStatusBtn').onclick=function(){openForm('fuel')};
 document.getElementById('mapBtn').onclick=openNavigator;
 document.getElementById('nextBtn').onclick=function(){if(stage<stages.length-1){stage++;persist()}};
 document.getElementById('fuelBtn').onclick=function(){openForm('fuel')};
