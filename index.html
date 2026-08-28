@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d91">
 <link rel="manifest" href="manifest.webmanifest">
-<title>RoadBook v0.7.4</title>
+<title>RoadBook v0.7.5</title>
 <style>
 :root{--b:#0b3d91;--g:#0b8f45;--bg:#f5f7fb;--t:#142033;--m:#687386;--l:#e2e7ef}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--t)}
@@ -34,7 +34,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <body>
 <div class="app">
 <header><div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
-<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.7.4</div></header>
+<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.7.5</div></header>
 <main>
 <section class="card current"><div><div class="pin">📍</div><div class="place" id="nextName">Краснодар</div><div class="muted" id="nextInfo">Следующая точка маршрута</div></div>
 <div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
@@ -227,7 +227,7 @@ document.getElementById('stopBtn').onclick=function(){openForm('stop')};
 document.getElementById('noteBtn').onclick=function(){openForm('note')};
 document.getElementById('journalBtn').onclick=function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})};
 document.getElementById('homeBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
-document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.7.4\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
+document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.7.5\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
 modalBack.onclick=function(e){if(e.target===modalBack)closeModal()};
 addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
 addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
@@ -325,7 +325,7 @@ function showSetup(first){
  el('setupSave').onclick=function(){const y={car:el('setupCar').value,route:el('setupRoute').value,tank:+el('setupTank').value,gasRate:+el('setupGas').value,petrolRate:+el('setupPetrol').value,restKm:+el('setupRest').value||250};saveSetup(y);applySetup(y);closeModal();renderPlanner(y)};
  modalBack.classList.add('show');
 }
-function applySetup(x){const rd=routeData[x.route]||routeData['anapa-ekb'];document.querySelector('.route').textContent=rd.title;document.querySelector('.sub').textContent='дорожный помощник · v0.7.4';
+function applySetup(x){const rd=routeData[x.route]||routeData['anapa-ekb'];document.querySelector('.route').textContent=rd.title;document.querySelector('.sub').textContent='дорожный помощник · v0.7.5';
  let badge=el('setupBadge'); if(!badge){badge=document.createElement('div');badge.id='setupBadge';badge.className='setup-badge';document.querySelector('.route').after(badge)} badge.textContent='🚙 '+x.car+' · ⛽ '+(x.tank||0)+' л';
 }
 function makeStops(x){
@@ -362,7 +362,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 })();
 </script>
 <script>
-/* RoadBook v0.7.4 — автомобиль, маршрут и автоматический план остановок */
+/* RoadBook v0.7.5 — автомобиль, маршрут и автоматический план остановок */
 (function () {
   const KEY = "roadbook_trip_v074";
 
@@ -414,7 +414,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
       "margin:16px 0;padding:14px;border:1px solid #ccc;border-radius:14px;background:#fff;font-family:system-ui,-apple-system,sans-serif";
 
     p.innerHTML = `
-      <h2 style="margin:0 0 12px">🚗 План поездки — v0.7.4</h2>
+      <h2 style="margin:0 0 12px">🚗 План поездки — v0.7.5</h2>
 
       <details open>
         <summary style="font-weight:700;cursor:pointer">Автомобиль</summary>
@@ -506,7 +506,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 
       /*
        * Расчёт LPG-сегментов.
-       * В v0.7.4 АГЗС представлены как расчётные точки по запасу хода.
+       * В v0.7.5 АГЗС представлены как расчётные точки по запасу хода.
        * В следующей версии эти точки будут заменены реальными АГЗС,
        * найденными вдоль маршрута.
        */
@@ -563,7 +563,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 
       list += `</ol>
         <div style="font-size:13px;color:#666">
-          ℹ️ В v0.7.4 расстояние до АГЗС рассчитывается по запасу хода.
+          ℹ️ В v0.7.5 расстояние до АГЗС рассчитывается по запасу хода.
           Для автоматического поиска реальных АГЗС по маршруту нужен следующий этап.
         </div>`;
 
@@ -579,7 +579,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 </script>
 
 <script>
-/* v0.7.4 FIX — надёжный обработчик кнопки построения плана */
+/* v0.7.5 FIX — надёжный обработчик кнопки построения плана */
 (function () {
   function buildPlan() {
     const get = id => document.getElementById(id);
@@ -657,7 +657,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 
     html += `</ol>
       <div style="font-size:13px;color:#666">
-        В v0.7.4 точки LPG пока расчётные. В следующей версии подключим реальные АГЗС.
+        В v0.7.5 точки LPG пока расчётные. В следующей версии подключим реальные АГЗС.
       </div>`;
 
     out.innerHTML = html;
@@ -675,6 +675,61 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 
   // На случай, если существующий обработчик был повреждён.
   window.buildRoadBookPlanV074 = buildPlan;
+})();
+</script>
+
+<script>
+/* RoadBook v0.7.5 — automatic route distance */
+(function(){
+  const KEY="roadbook_route_v075";
+  function calculateRoute(start,finish){
+    return Promise.all([
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(start)),
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(finish))
+    ]).then(async r=>{
+      const a=await r[0].json(), b=await r[1].json();
+      if(!a[0]||!b[0]) throw new Error("Не удалось найти город");
+      const u="https://router.project-osrm.org/route/v1/driving/"+
+        a[0].lon+","+a[0].lat+";"+b[0].lon+","+b[0].lat+"?overview=false";
+      const rr=await fetch(u), data=await rr.json();
+      if(!data.routes||!data.routes[0]) throw new Error("Маршрут не найден");
+      return data.routes[0].distance/1000;
+    });
+  }
+  function init(){
+    const s=document.getElementById("v074-start");
+    const f=document.getElementById("v074-finish");
+    const d=document.getElementById("v074-distance");
+    const b=document.getElementById("v074-calc");
+    if(!s||!f||!d||!b) return;
+    d.readOnly=true;
+    d.placeholder="Рассчитывается автоматически";
+    d.style.background="#f5f5f5";
+    function update(){
+      const start=s.value.trim(), finish=f.value.trim();
+      if(start.length<2||finish.length<2) return;
+      d.value="Рассчитываем…";
+      calculateRoute(start,finish).then(km=>{
+        d.value=km.toFixed(0);
+        localStorage.setItem(KEY,JSON.stringify({start,finish,distance:km}));
+      }).catch(()=>{
+        try{
+          const x=JSON.parse(localStorage.getItem(KEY)||"null");
+          if(x&&x.start===start&&x.finish===finish){
+            d.value=x.distance.toFixed(0);
+          }else d.value="";
+        }catch(e){d.value=""}
+      });
+    }
+    s.addEventListener("change",update);
+    f.addEventListener("change",update);
+    s.addEventListener("blur",update);
+    f.addEventListener("blur",update);
+    if(s.value.trim()&&f.value.trim()&&!d.value) update();
+  }
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(init,500));
+  else setTimeout(init,500);
 })();
 </script>
 </body></html>
