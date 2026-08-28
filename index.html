@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d91">
 <link rel="manifest" href="manifest.webmanifest">
-<title>RoadBook v0.5</title>
+<title>RoadBook v0.7.3</title>
 <style>
 :root{--b:#0b3d91;--g:#0b8f45;--bg:#f5f7fb;--t:#142033;--m:#687386;--l:#e2e7ef}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--t)}
@@ -27,18 +27,20 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 .field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:13px;border:1px solid var(--l);border-radius:12px;font-size:16px;background:#fff}
 .modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1;padding:14px;border-radius:13px;border:0;font-weight:700;font-size:16px}.save{background:var(--g);color:#fff}.cancel{background:#eef1f5}
 .empty{color:var(--m);text-align:center;padding:20px}
-.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}.gasfinish{background:#fff1f0!important;color:#a61b1b!important;border:1px solid #f3c7c3!important}</style>
+.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}.gasfinish{background:#fff1f0!important;color:#a61b1b!important;border:1px solid #f3c7c3!important}
+.gasstations{margin-top:10px}.station{padding:12px 0;border-top:1px solid #e5e7eb}.station:first-child{border-top:0}.station-title{font-weight:800}.station-meta{font-size:13px;color:#667085;margin-top:4px}.station-price{font-weight:800;margin-top:5px}.station-btn{width:100%;border:0;border-radius:12px;padding:10px;margin-top:8px;background:#eef6ff;color:#084c9e;font-weight:800}
+.planrow{padding:12px 0;border-bottom:1px solid var(--l)}.planrow:last-child{border-bottom:0}.planrow b{display:block}.planok{color:#08783d;font-weight:800}.planwarn{color:#b42318;font-weight:800}.setup-badge{display:inline-block;padding:5px 9px;border-radius:10px;background:#e8f3ff;color:#0b3d91;font-size:12px;font-weight:700;margin-top:6px}.planner-btn{width:100%;padding:12px;border:0;border-radius:13px;background:#e8f3ff;color:#0b3d91;font-weight:800;margin-top:8px}.</style>
 </head>
 <body>
 <div class="app">
 <header><div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
-<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.5</div></header>
+<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.7.3</div></header>
 <main>
 <section class="card current"><div><div class="pin">📍</div><div class="place" id="nextName">Краснодар</div><div class="muted" id="nextInfo">Следующая точка маршрута</div></div>
 <div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
 
 <button class="big" id="navBtn">🧭 НАВИГАТОР<br><small>Открыть маршрут в Яндекс Навигаторе</small></button>
-<button class="secondary" id="nextBtn">➡️ Следующая точка маршрута</button>
+<button class="secondary" id="nextBtn">➡️ Следующая точка маршрута</button><button class="secondary" id="plannerBtn">🧠 Автоплан остановок</button>
 
 <section class="card"><b>🛣 Маршрут поездки</b><div id="stages"></div></section>
 
@@ -48,7 +50,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <button class="action stop" id="stopBtn"><span>📍</span>ОСТАНОВКА</button>
 <button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button></div>
 
-<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button><button class="fuelbtn gasfinish" id="gasFinishedBtn">⚠️ Газ закончился</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
+<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button><button class="fuelbtn gasfinish" id="gasFinishedBtn">⚠️ Газ закончился</button><button class="fuelbtn" id="switchedPetrolBtn">🔄 Перешёл на бензин</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
 <section class="card sync"><b>☁️ Локальное сохранение</b><span id="syncText">Можно записывать расходы без интернета.</span></section>
 <section class="card"><b>📋 Последние записи</b><div id="records" class="empty">Пока записей нет</div></section>
 </main>
@@ -77,7 +79,7 @@ let records=[]; let stage=0;
 try{records=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){records=[]}
 try{stage=Math.max(0,Math.min(stages.length-1,Number(localStorage.getItem(STAGE_KEY)||0)))}catch(e){stage=0} 
 const FUEL_KEY='roadbook_v06_fuel';
-let fuel={gasLeft:null,petrolLeft:null,gasRate:null,petrolRate:null,lastGasOdo:null,lastPetrolOdo:null,gasTank:35,petrolTank:null};
+let fuel={gasLeft:null,petrolLeft:null,gasRate:null,petrolRate:null,lastGasOdo:null,lastPetrolOdo:null,gasTank:35,petrolTank:null,gasSwitchDistance:null,gasSwitches:[]};
 try{const x=JSON.parse(localStorage.getItem(FUEL_KEY)||'null');if(x)fuel=Object.assign(fuel,x)}catch(e){}
 function saveFuel(){try{localStorage.setItem(FUEL_KEY,JSON.stringify(fuel))}catch(e){}}
 function fuelRange(left,rate){return left!=null&&rate>0?Math.round(left/rate*100):null}
@@ -87,6 +89,13 @@ const modalBack=document.getElementById('modalBack'), modal=document.getElementB
 function v(id){const e=document.getElementById(id);return e?(e.value||'').trim():''}
 function n(id){return Number(v(id).replace(',','.'))||0}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(records));localStorage.setItem(STAGE_KEY,String(stage))}catch(e){}render()}
+
+const GAS_STATIONS=[{"name": "М4 1116 км — Газпром №232, х. Степнянский", "fuel": "Пропан", "price": "34.20", "km": "М4, 1116 км"}, {"name": "М4 1144 км — Роснефть №36, ст. Кущевская", "fuel": "Пропан", "price": "33.85", "km": "М4, 1144 км"}, {"name": "М4 1179 км — Роснефть №47, ст. Октябрьская", "fuel": "Пропан", "price": "33.85", "km": "М4, 1179 км"}, {"name": "М4 1180 км — Лукойл №23176, ст. Октябрьская", "fuel": "Пропан", "price": "33.60", "km": "М4, 1180 км"}, {"name": "М4 1194 км — Газпром №202, ст. Павловская", "fuel": "Пропан", "price": "33.60", "km": "М4, 1194 км"}, {"name": "М4 1216 км — Газпром №191, ст. Старолеушковская", "fuel": "Пропан", "price": "33.60", "km": "М4, 1216 км"}, {"name": "М4 1248 км — Газпром №198, ст. Березанская", "fuel": "Пропан", "price": "—", "km": "М4, 1248 км"}, {"name": "М4 1277 км — Роснефть №125", "fuel": "Пропан", "price": "32.70", "km": "М4, 1277 км"}, {"name": "М4 1302 км — Роснефть №74, ст. Пластуновская", "fuel": "Пропан", "price": "33.85", "km": "М4, 1302 км"}, {"name": "М4 1337 км — АГЗС, Краснодар", "fuel": "Пропан", "price": "—", "km": "М4, 1337 км"}, {"name": "М4 1367 км — Татнефть №420, с. Молькино", "fuel": "Пропан", "price": "—", "km": "М4, 1367 км"}];
+function renderGasStations(){
+  const el=document.getElementById('gasStationsList');
+  if(!el)return;
+  el.innerHTML=GAS_STATIONS.map((x,i)=>'<div class="station"><div class="station-title">'+x.name+'</div><div class="station-meta">'+x.km+' · '+x.fuel+'</div><div class="station-price">'+(x.price==='—'?'Цена не указана':x.price+' ₽/л')+'</div><button class="station-btn" onclick="window.open('https://yandex.ru/maps/?text='+encodeURIComponent(x.name),'_blank')">📍 Открыть точку в Яндекс Картах</button></div>').join('');
+}
 function render(){
   let spent=0; records.forEach(r=>spent+=Number(r.sum||r.amount||0));
   const s=Math.round(spent).toLocaleString('ru-RU')+' ₽';
@@ -104,9 +113,16 @@ function render(){
   document.getElementById('gasRange').textContent=gr==null?'После первой полной заправки появится расчёт':'Запас ≈ '+gr+' км · '+fuel.gasRate.toFixed(1)+' л/100 км';
   document.getElementById('petrolRange').textContent=pr==null?'Укажи объём при первой заправке':'Запас ≈ '+pr+' км · '+fuel.petrolRate.toFixed(1)+' л/100 км';
   const fs=document.getElementById('fuelStatus');
-  if(gr!=null && gr<st.km){fs.className='muted fuelwarn';fs.textContent='🔴 Расчётного газа может не хватить до следующей точки.'}
-  else if(gr!=null){fs.className='muted fuelok';fs.textContent='🟢 Расчётного газа хватает до следующей точки.'}
-  else fs.className='muted';
+  if(fuel.gasSwitchDistance!=null){
+    fs.className='muted';
+    fs.textContent='🔄 Был ранний переход на бензин после '+fuel.gasSwitchDistance.toFixed(0)+' км на газе. Остаток газа неизвестен точно.';
+  }else if(gr!=null && gr<st.km){
+    fs.className='muted fuelwarn';
+    fs.textContent='🔴 Расчётного газа может не хватить до следующей точки.';
+  }else if(gr!=null){
+    fs.className='muted fuelok';
+    fs.textContent='🟢 Расчётного газа хватает до следующей точки.';
+  }else fs.className='muted';
   const box=document.getElementById('records');
   if(!records.length){box.className='empty';box.textContent='Пока записей нет'}else{
     box.className='';
@@ -144,6 +160,35 @@ saveFuel();
  records.unshift(r);persist();closeModal();
 }
 
+
+function switchedToPetrol(){
+  const km=prompt('Сколько км проехал на газе после последней заправки?','');
+  if(km===null)return;
+  const distance=parseFloat(String(km).replace(',','.'));
+  if(!isFinite(distance)||distance<=0){
+    alert('Введи корректное расстояние в километрах.');
+    return;
+  }
+
+  fuel.gasSwitchDistance=distance;
+  fuel.gasSwitches=fuel.gasSwitches||[];
+  fuel.gasSwitches.push({
+    distance:distance,
+    at:Date.now()
+  });
+
+  // Газ НЕ обнуляем: после раннего переключения точный остаток неизвестен.
+  saveFuel();
+  render();
+
+  alert(
+    '🔄 Переход на бензин записан.\n\n' +
+    'На газе после последней заправки: '+distance.toFixed(1)+' км.\n\n' +
+    'Остаток газа не обнуляем — этот цикл не считаем точным расходом. ' +
+    'После следующей полной заправки данные можно будет уточнить.'
+  );
+}
+
 function gasFinished(){
   const km=prompt('Сколько км проехал на газе после последней заправки?','');
   if(km===null)return;
@@ -173,6 +218,7 @@ function openNavigator(){
 document.getElementById('navBtn').onclick=openNavigator;
 document.getElementById('fuelStatusBtn').onclick=function(){openForm('fuel')};
 document.getElementById('gasFinishedBtn').onclick=gasFinished;
+document.getElementById('switchedPetrolBtn').onclick=switchedToPetrol;
 document.getElementById('mapBtn').onclick=openNavigator;
 document.getElementById('nextBtn').onclick=function(){if(stage<stages.length-1){stage++;persist()}};
 document.getElementById('fuelBtn').onclick=function(){openForm('fuel')};
@@ -181,11 +227,138 @@ document.getElementById('stopBtn').onclick=function(){openForm('stop')};
 document.getElementById('noteBtn').onclick=function(){openForm('note')};
 document.getElementById('journalBtn').onclick=function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})};
 document.getElementById('homeBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
-document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.5\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
+document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.7.3\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
 modalBack.onclick=function(e){if(e.target===modalBack)closeModal()};
 addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
 addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
 render();
 })();
 </script>
-</body></html>
+
+<script>
+(function(){
+  const KEY="roadbook_lpg_v072";
+  const dflt={tank:35,consumption:12,reserve:10,current:35,distance:""};
+  function load(){try{return Object.assign({},dflt,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){return dflt}}
+  function save(x){localStorage.setItem(KEY,JSON.stringify(x))}
+  function init(){
+    if(document.getElementById("lpg-v072"))return;
+    const p=document.createElement("section");
+    p.id="lpg-v072";
+    p.style.cssText="margin:16px 0;padding:14px;border:1px solid #ccc;border-radius:12px;background:#fff;font-family:system-ui";
+    p.innerHTML=`<h3 style="margin:0 0 12px">⛽ Газ до следующей АГЗС — v0.7.2</h3>
+    <div style="display:grid;gap:9px">
+    <label>Объём баллона, л<input id="lpg-tank" type="number" min="1" step=".1" value="35" style="width:100%;box-sizing:border-box"></label>
+    <label>Расход газа, л/100 км<input id="lpg-cons" type="number" min="1" step=".1" value="12" style="width:100%;box-sizing:border-box"></label>
+    <label>Фактический остаток газа, л<input id="lpg-cur" type="number" min="0" step=".1" value="35" style="width:100%;box-sizing:border-box"></label>
+    <label>Запас безопасности, %<input id="lpg-res" type="number" min="0" max="50" step="1" value="10" style="width:100%;box-sizing:border-box"></label>
+    <label>Расстояние до следующей АГЗС, км<input id="lpg-dist" type="number" min="0" step="1" placeholder="например, 180" style="width:100%;box-sizing:border-box"></label>
+    <button id="lpg-btn" type="button" style="padding:11px;border:0;border-radius:9px">Проверить запас газа</button>
+    <div id="lpg-out" aria-live="polite"></div></div>`;
+    (document.querySelector("main")||document.querySelector("#app")||document.body).appendChild(p);
+    const x=load();
+    document.getElementById("lpg-tank").value=x.tank;
+    document.getElementById("lpg-cons").value=x.consumption;
+    document.getElementById("lpg-cur").value=x.current;
+    document.getElementById("lpg-res").value=x.reserve;
+    document.getElementById("lpg-dist").value=x.distance;
+    document.getElementById("lpg-btn").onclick=function(){
+      const tank=+document.getElementById("lpg-tank").value;
+      const cons=+document.getElementById("lpg-cons").value;
+      const cur=+document.getElementById("lpg-cur").value;
+      const res=+document.getElementById("lpg-res").value;
+      const dist=+document.getElementById("lpg-dist").value;
+      save({tank,consumption:cons,current:cur,reserve:res,distance:dist});
+      const out=document.getElementById("lpg-out");
+      if(!(cons>0)||cur<0||!(dist>=0)){out.textContent="Введите корректные данные.";return}
+      const safe=cur*(1-res/100), need=dist*cons/100, diff=safe-need;
+      if(diff>=0){
+        out.innerHTML=`<div style="padding:10px;border-radius:9px;background:#eaf7ea">
+        <b>✅ До следующей АГЗС газа хватит.</b><br>
+        Потребуется: <b>${need.toFixed(1)} л</b><br>
+        Доступно с учётом запаса: <b>${safe.toFixed(1)} л</b><br>
+        Останется: <b>${diff.toFixed(1)} л</b> (≈ ${(diff/cons*100).toFixed(0)} км)</div>`;
+      }else{
+        const lack=-diff;
+        out.innerHTML=`<div style="padding:10px;border-radius:9px;background:#fff0f0">
+        <b>⚠️ До следующей АГЗС газа не хватит.</b><br>
+        Потребуется: <b>${need.toFixed(1)} л</b><br>
+        Безопасно доступно: <b>${safe.toFixed(1)} л</b><br>
+        Не хватает: <b>${lack.toFixed(1)} л</b> (≈ ${(lack/cons*100).toFixed(0)} км)</div>`;
+      }
+    };
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const SETUP_KEY='roadbook_setup_v073';
+const setupDefault={car:'Suzuki Grand Vitara 2.4 МКПП + LPG',tank:35,gasRate:12,petrolTank:35,petrolRate:10,route:'anapa-ekb'};
+const routeData={
+ 'anapa-ekb':{title:'Анапа → Екатеринбург',total:2936,stages:[
+  ['Анапа',0],['Краснодар',186],['Кропоткин',356],['Волгоград',1006],['Саратов',1396],['Самара',1826],['Уфа',2296],['Челябинск',2726],['Екатеринбург',2936]
+ ]}
+};
+const cars={
+ 'Suzuki Grand Vitara 2.4 МКПП + LPG':{tank:35,gasRate:12,petrolTank:35,petrolRate:10},
+ 'Suzuki Grand Vitara 2.4 МКПП — только бензин':{tank:0,gasRate:0,petrolTank:35,petrolRate:10},
+ 'Другое авто':{tank:35,gasRate:12,petrolTank:35,petrolRate:10}
+};
+function getSetup(){try{return Object.assign({},setupDefault,JSON.parse(localStorage.getItem(SETUP_KEY)||'{}'))}catch(e){return {...setupDefault}}}
+function saveSetup(x){localStorage.setItem(SETUP_KEY,JSON.stringify(x))}
+function el(id){return document.getElementById(id)}
+function showSetup(first){
+ const x=getSetup();
+ modal.innerHTML='<h2>🚙 Перед поездкой</h2>'+
+ '<div class="field"><label>Автомобиль</label><select id="setupCar"><option>Suzuki Grand Vitara 2.4 МКПП + LPG</option><option>Suzuki Grand Vitara 2.4 МКПП — только бензин</option><option>Другое авто</option></select></div>'+ 
+ '<div class="field"><label>Маршрут</label><select id="setupRoute"><option value="anapa-ekb">Анапа → Екатеринбург</option></select></div>'+ 
+ '<div class="field"><label>Объём газового баллона, л</label><input id="setupTank" type="number" min="0" step="0.1"></div>'+ 
+ '<div class="field"><label>Средний расход газа, л/100 км</label><input id="setupGas" type="number" min="0" step="0.1"></div>'+ 
+ '<div class="field"><label>Средний расход бензина, л/100 км</label><input id="setupPetrol" type="number" min="1" step="0.1"></div>'+ 
+ '<div class="field"><label>Максимальный интервал отдыха, км</label><input id="setupRest" type="number" min="50" step="10" value="250"></div>'+ 
+ '<div class="modal-actions"><button class="cancel" id="setupCancel">Отмена</button><button class="save" id="setupSave">Построить план</button></div>';
+ el('setupCar').value=x.car;el('setupRoute').value=x.route;el('setupTank').value=x.tank;el('setupGas').value=x.gasRate;el('setupPetrol').value=x.petrolRate;
+ el('setupCar').onchange=function(){const c=cars[this.value];if(c){el('setupTank').value=c.tank;el('setupGas').value=c.gasRate;el('setupPetrol').value=c.petrolRate}};
+ el('setupCancel').onclick=()=>{if(!first)closeModal()};
+ el('setupSave').onclick=function(){const y={car:el('setupCar').value,route:el('setupRoute').value,tank:+el('setupTank').value,gasRate:+el('setupGas').value,petrolRate:+el('setupPetrol').value,restKm:+el('setupRest').value||250};saveSetup(y);applySetup(y);closeModal();renderPlanner(y)};
+ modalBack.classList.add('show');
+}
+function applySetup(x){const rd=routeData[x.route]||routeData['anapa-ekb'];document.querySelector('.route').textContent=rd.title;document.querySelector('.sub').textContent='дорожный помощник · v0.7.3';
+ let badge=el('setupBadge'); if(!badge){badge=document.createElement('div');badge.id='setupBadge';badge.className='setup-badge';document.querySelector('.route').after(badge)} badge.textContent='🚙 '+x.car+' · ⛽ '+(x.tank||0)+' л';
+}
+function makeStops(x){
+ const rd=routeData[x.route]||routeData['anapa-ekb']; const cons=x.gasRate||0; const tank=x.tank||0;
+ const safeRange=cons>0?tank/cons*100*0.9:Infinity; const rest=x.restKm||250; const arr=[]; let last=0;
+ for(let d=rest;d<rd.total;d+=rest){arr.push({km:d,type:'rest',name:'Остановка для отдыха',note:'примерно каждые '+rest+' км'});}
+ if(safeRange!==Infinity){
+  let target=safeRange;
+  while(target<rd.total){
+   let best=GAS_STATIONS.find(s=>{const m=(s.km.match(/(\\d+)/)||[])[1];return m&&Number(m)>=target-120&&Number(m)<=target+120});
+   arr.push({km:Math.round(target),type:'gas',name:best?best.name:'Плановая заправка LPG',note:best?'АГЗС из базы маршрута':'Нужна АГЗС рядом с этой отметкой'});
+   target+=safeRange;
+  }
+ }
+ // Привязка к ближайшему городу/этапу и сортировка. Газовая остановка важнее обычной при близких точках.
+ arr.sort((a,b)=>a.km-b.km||((a.type==='gas')?-1:1));
+ const merged=[]; for(const s of arr){const prev=merged[merged.length-1]; if(prev&&Math.abs(prev.km-s.km)<45){prev.note+=' · '+s.name; if(s.type==='gas')prev.type='gas';} else merged.push(s)}
+ return {range:safeRange,total:rd.total,stops:merged};
+}
+function renderPlanner(x){
+ const old=el('autoPlan'); if(old)old.remove();
+ const plan=makeStops(x); const sec=document.createElement('section');sec.className='card';sec.id='autoPlan';
+ let text=''; if(!plan.stops.length) text='<div class="empty">Автоматические остановки не рассчитаны: укажи расход и объём газа.</div>';
+ else text=plan.stops.map((s,i)=>'<div class="planrow"><b>'+(i+1)+'. '+(s.type==='gas'?'⛽ ':'🛌 ')+s.name+'</b><span>км '+s.km+' · '+s.note+'</span>'+(s.type==='gas'?'<div class="planok">Заправка рекомендована по запасу LPG</div>':'')).join('');
+ sec.innerHTML='<b>🧠 Автоматический план остановок</b><div class="muted">Безопасный газовый пробег: '+(plan.range===Infinity?'—':Math.round(plan.range)+' км')+'. Точки отдыха: каждые '+(x.restKm||250)+' км.</div>'+text+'<button class="planner-btn" id="editSetup">⚙️ Изменить автомобиль / маршрут</button>';
+ const main=document.querySelector('main');main.insertBefore(sec,main.querySelector('.grid'));el('editSetup').onclick=()=>showSetup(false);
+}
+function initSetup(){const x=localStorage.getItem(SETUP_KEY);if(x){const y=getSetup();applySetup(y);renderPlanner(y)}else showSetup(true)}
+const modalBack=document.getElementById('modalBack'),modal=document.getElementById('modal');
+window.addEventListener('load',initSetup);
+window.addEventListener('online',()=>{const s=document.getElementById('status');if(s)s.textContent='🟢 ONLINE'});
+window.addEventListener('offline',()=>{const s=document.getElementById('status');if(s)s.textContent='🔴 OFFLINE'});
+const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn.onclick=()=>showSetup(false);
+})();
+</script></body></html>
+window.addEventListener('load',renderGasStations);
