@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d91">
 <link rel="manifest" href="manifest.webmanifest">
-<title>RoadBook v0.7.3</title>
+<title>RoadBook v0.7.4</title>
 <style>
 :root{--b:#0b3d91;--g:#0b8f45;--bg:#f5f7fb;--t:#142033;--m:#687386;--l:#e2e7ef}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--t)}
@@ -34,7 +34,7 @@ nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav
 <body>
 <div class="app">
 <header><div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
-<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.7.3</div></header>
+<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.7.4</div></header>
 <main>
 <section class="card current"><div><div class="pin">📍</div><div class="place" id="nextName">Краснодар</div><div class="muted" id="nextInfo">Следующая точка маршрута</div></div>
 <div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
@@ -227,7 +227,7 @@ document.getElementById('stopBtn').onclick=function(){openForm('stop')};
 document.getElementById('noteBtn').onclick=function(){openForm('note')};
 document.getElementById('journalBtn').onclick=function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})};
 document.getElementById('homeBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
-document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.7.3\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
+document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.7.4\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
 modalBack.onclick=function(e){if(e.target===modalBack)closeModal()};
 addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
 addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
@@ -325,7 +325,7 @@ function showSetup(first){
  el('setupSave').onclick=function(){const y={car:el('setupCar').value,route:el('setupRoute').value,tank:+el('setupTank').value,gasRate:+el('setupGas').value,petrolRate:+el('setupPetrol').value,restKm:+el('setupRest').value||250};saveSetup(y);applySetup(y);closeModal();renderPlanner(y)};
  modalBack.classList.add('show');
 }
-function applySetup(x){const rd=routeData[x.route]||routeData['anapa-ekb'];document.querySelector('.route').textContent=rd.title;document.querySelector('.sub').textContent='дорожный помощник · v0.7.3';
+function applySetup(x){const rd=routeData[x.route]||routeData['anapa-ekb'];document.querySelector('.route').textContent=rd.title;document.querySelector('.sub').textContent='дорожный помощник · v0.7.4';
  let badge=el('setupBadge'); if(!badge){badge=document.createElement('div');badge.id='setupBadge';badge.className='setup-badge';document.querySelector('.route').after(badge)} badge.textContent='🚙 '+x.car+' · ⛽ '+(x.tank||0)+' л';
 }
 function makeStops(x){
@@ -360,5 +360,222 @@ window.addEventListener('online',()=>{const s=document.getElementById('status');
 window.addEventListener('offline',()=>{const s=document.getElementById('status');if(s)s.textContent='🔴 OFFLINE'});
 const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn.onclick=()=>showSetup(false);
 })();
-</script></body></html>
+</script>
+<script>
+/* RoadBook v0.7.4 — автомобиль, маршрут и автоматический план остановок */
+(function () {
+  const KEY = "roadbook_trip_v074";
+
+  const defaults = {
+    car: {
+      name: "Suzuki Grand Vitara",
+      year: 2008,
+      engine: "2.4",
+      gearbox: "МКПП",
+      petrolTank: 35,
+      lpgTank: 35,
+      petrolConsumption: 10,
+      lpgConsumption: 12,
+      fuelMode: "LPG"
+    },
+    route: {
+      name: "Анапа → Екатеринбург",
+      start: "Анапа",
+      finish: "Екатеринбург",
+      distance: 0
+    },
+    settings: {
+      lpgReserve: 10,
+      restEvery: 250,
+      mealEvery: 500,
+      startLpg: 35
+    }
+  };
+
+  function load() {
+    try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(KEY) || "{}")); }
+    catch (e) { return JSON.parse(JSON.stringify(defaults)); }
+  }
+  function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+
+  function input(id, label, value, type="text", step="") {
+    return `<label style="display:grid;gap:4px">${label}
+      <input id="${id}" type="${type}" value="${value ?? ""}" ${step ? `step="${step}"` : ""}
+      style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #bbb;border-radius:8px"></label>`;
+  }
+
+  function init() {
+    if (document.getElementById("trip-v074")) return;
+
+    const d = load();
+    const p = document.createElement("section");
+    p.id = "trip-v074";
+    p.style.cssText =
+      "margin:16px 0;padding:14px;border:1px solid #ccc;border-radius:14px;background:#fff;font-family:system-ui,-apple-system,sans-serif";
+
+    p.innerHTML = `
+      <h2 style="margin:0 0 12px">🚗 План поездки — v0.7.4</h2>
+
+      <details open>
+        <summary style="font-weight:700;cursor:pointer">Автомобиль</summary>
+        <div style="display:grid;gap:8px;margin-top:10px">
+          ${input("v074-car-name","Марка и модель",d.car.name)}
+          ${input("v074-car-year","Год",d.car.year,"number")}
+          ${input("v074-engine","Двигатель",d.car.engine)}
+          ${input("v074-gearbox","Коробка",d.car.gearbox)}
+          ${input("v074-petrol","Бензобак, л",d.car.petrolTank,"number",".1")}
+          ${input("v074-lpg","Газовый баллон, л",d.car.lpgTank,"number",".1")}
+          ${input("v074-petrol-cons","Расход бензина, л/100 км",d.car.petrolConsumption,"number",".1")}
+          ${input("v074-lpg-cons","Расход газа, л/100 км",d.car.lpgConsumption,"number",".1")}
+          <label>Основное топливо
+            <select id="v074-mode" style="width:100%;padding:8px;border:1px solid #bbb;border-radius:8px">
+              <option value="LPG">LPG</option>
+              <option value="PETROL">Бензин</option>
+            </select>
+          </label>
+        </div>
+      </details>
+
+      <details open style="margin-top:12px">
+        <summary style="font-weight:700;cursor:pointer">Маршрут</summary>
+        <div style="display:grid;gap:8px;margin-top:10px">
+          ${input("v074-start","Откуда",d.route.start)}
+          ${input("v074-finish","Куда",d.route.finish)}
+          ${input("v074-distance","Длина маршрута, км",d.route.distance,"number",".1")}
+        </div>
+      </details>
+
+      <details open style="margin-top:12px">
+        <summary style="font-weight:700;cursor:pointer">План остановок</summary>
+        <div style="display:grid;gap:8px;margin-top:10px">
+          ${input("v074-reserve","Запас газа, %",d.settings.lpgReserve,"number","1")}
+          ${input("v074-rest","Отдых каждые, км",d.settings.restEvery,"number","1")}
+          ${input("v074-meal","Питание каждые, км",d.settings.mealEvery,"number","1")}
+          ${input("v074-start-lpg","Газ после старта/заправки, л",d.settings.startLpg,"number",".1")}
+        </div>
+      </details>
+
+      <button id="v074-calc" type="button"
+        style="width:100%;margin-top:14px;padding:12px;border:0;border-radius:10px;cursor:pointer;font-size:16px">
+        🧭 Рассчитать поездку
+      </button>
+
+      <div id="v074-result" style="margin-top:14px"></div>
+    `;
+
+    (document.querySelector("main") || document.querySelector("#app") ||
+     document.querySelector(".container") || document.body).appendChild(p);
+
+    document.getElementById("v074-mode").value = d.car.fuelMode;
+
+    document.getElementById("v074-calc").onclick = function () {
+      const car = {
+        name: document.getElementById("v074-car-name").value.trim(),
+        year: +document.getElementById("v074-car-year").value,
+        engine: document.getElementById("v074-engine").value.trim(),
+        gearbox: document.getElementById("v074-gearbox").value.trim(),
+        petrolTank: +document.getElementById("v074-petrol").value,
+        lpgTank: +document.getElementById("v074-lpg").value,
+        petrolConsumption: +document.getElementById("v074-petrol-cons").value,
+        lpgConsumption: +document.getElementById("v074-lpg-cons").value,
+        fuelMode: document.getElementById("v074-mode").value
+      };
+
+      const route = {
+        start: document.getElementById("v074-start").value.trim(),
+        finish: document.getElementById("v074-finish").value.trim(),
+        distance: +document.getElementById("v074-distance").value
+      };
+
+      const settings = {
+        lpgReserve: +document.getElementById("v074-reserve").value,
+        restEvery: +document.getElementById("v074-rest").value,
+        mealEvery: +document.getElementById("v074-meal").value,
+        startLpg: +document.getElementById("v074-start-lpg").value
+      };
+
+      save({car, route, settings});
+
+      const out = document.getElementById("v074-result");
+
+      if (!route.distance || route.distance <= 0 ||
+          car.lpgConsumption <= 0 || settings.startLpg < 0) {
+        out.innerHTML = "<b>Введите длину маршрута и корректные параметры автомобиля.</b>";
+        return;
+      }
+
+      /*
+       * Расчёт LPG-сегментов.
+       * В v0.7.4 АГЗС представлены как расчётные точки по запасу хода.
+       * В следующей версии эти точки будут заменены реальными АГЗС,
+       * найденными вдоль маршрута.
+       */
+      const safeLiters = settings.startLpg * (1 - settings.lpgReserve / 100);
+      const gasRange = safeLiters / car.lpgConsumption * 100;
+
+      const stops = [];
+      let km = 0;
+      let nextRest = settings.restEvery;
+      let nextMeal = settings.mealEvery;
+      let nextGas = gasRange;
+
+      while (km < route.distance) {
+        const candidates = [
+          {km: nextGas, type:"fuel", title:"⛽ АГЗС", priority:1},
+          {km: nextRest, type:"rest", title:"☕ Отдых", priority:3},
+          {km: nextMeal, type:"meal", title:"🍴 Питание", priority:2}
+        ].filter(x => x.km > km && x.km < route.distance);
+
+        if (!candidates.length) break;
+
+        candidates.sort((a,b) => a.km - b.km || a.priority - b.priority);
+        const point = candidates[0];
+
+        // Если точки отдыха/еды почти совпадают с АГЗС — объединяем их.
+        const same = candidates.filter(x => Math.abs(x.km - point.km) <= 20);
+        const merged = same.length > 1;
+        stops.push({
+          km: point.km,
+          title: merged ? same.map(x=>x.title).join(" + ") : point.title,
+          type: point.type
+        });
+
+        if (same.some(x=>x.type==="fuel")) nextGas += gasRange;
+        if (same.some(x=>x.type==="rest")) nextRest += settings.restEvery;
+        if (same.some(x=>x.type==="meal")) nextMeal += settings.mealEvery;
+
+        km = point.km;
+      }
+
+      let list = `<div style="padding:10px;border-radius:10px;background:#f6f6f6">
+        <b>Маршрут:</b> ${route.start} → ${route.finish}<br>
+        <b>Длина:</b> ${route.distance.toFixed(0)} км<br>
+        <b>Безопасный пробег на газе:</b> ${gasRange.toFixed(0)} км
+      </div>
+      <h3>План остановок</h3>
+      <ol style="padding-left:24px">`;
+
+      if (!stops.length) list += "<li>Остановки внутри заданного маршрута не рассчитаны.</li>";
+
+      stops.forEach(s => {
+        list += `<li style="margin:8px 0"><b>${s.km.toFixed(0)} км</b> — ${s.title}</li>`;
+      });
+
+      list += `</ol>
+        <div style="font-size:13px;color:#666">
+          ℹ️ В v0.7.4 расстояние до АГЗС рассчитывается по запасу хода.
+          Для автоматического поиска реальных АГЗС по маршруту нужен следующий этап.
+        </div>`;
+
+      out.innerHTML = list;
+    };
+  }
+
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else
+    init();
+})();
+</script>
+</body></html>
 window.addEventListener('load',renderGasStations);
