@@ -577,5 +577,105 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
     init();
 })();
 </script>
+
+<script>
+/* v0.7.4 FIX — надёжный обработчик кнопки построения плана */
+(function () {
+  function buildPlan() {
+    const get = id => document.getElementById(id);
+    const out = get("v074-result");
+
+    if (!out) return;
+
+    const start = (get("v074-start")?.value || "Анапа").trim();
+    const finish = (get("v074-finish")?.value || "Екатеринбург").trim();
+    const distance = Number(get("v074-distance")?.value || 0);
+    const lpg = Number(get("v074-start-lpg")?.value || 35);
+    const consumption = Number(get("v074-lpg-cons")?.value || 12);
+    const reserve = Number(get("v074-reserve")?.value || 10);
+    const restEvery = Number(get("v074-rest")?.value || 250);
+    const mealEvery = Number(get("v074-meal")?.value || 500);
+
+    if (!distance || distance <= 0) {
+      out.innerHTML = '<div style="padding:12px;border-radius:10px;background:#fff0f0"><b>⚠️ Укажи длину маршрута в километрах.</b></div>';
+      return;
+    }
+
+    if (!consumption || consumption <= 0) {
+      out.innerHTML = '<div style="padding:12px;border-radius:10px;background:#fff0f0"><b>⚠️ Укажи расход газа.</b></div>';
+      return;
+    }
+
+    const safeLiters = lpg * (1 - reserve / 100);
+    const gasRange = safeLiters / consumption * 100;
+
+    const stops = [];
+    let gasKm = gasRange;
+    let restKm = restEvery;
+    let mealKm = mealEvery;
+
+    while (gasKm < distance || restKm < distance || mealKm < distance) {
+      const candidates = [
+        { km: gasKm, title: "⛽ Заправка LPG", type: "gas" },
+        { km: restKm, title: "☕ Отдых", type: "rest" },
+        { km: mealKm, title: "🍴 Питание", type: "meal" }
+      ].filter(x => x.km > 0 && x.km < distance);
+
+      if (!candidates.length) break;
+
+      candidates.sort((a,b) => a.km - b.km);
+      const first = candidates[0];
+
+      const same = candidates.filter(x => Math.abs(x.km - first.km) <= 20);
+      stops.push({
+        km: first.km,
+        title: same.map(x => x.title).join(" + ")
+      });
+
+      if (same.some(x => x.type === "gas")) gasKm += gasRange;
+      if (same.some(x => x.type === "rest")) restKm += restEvery;
+      if (same.some(x => x.type === "meal")) mealKm += mealEvery;
+    }
+
+    let html = `
+      <div style="padding:12px;border-radius:10px;background:#f5f5f5">
+        <b>🧭 План построен</b><br>
+        ${start} → ${finish}<br>
+        Расстояние: <b>${distance.toFixed(0)} км</b><br>
+        Безопасный запас хода на газе: <b>${gasRange.toFixed(0)} км</b>
+      </div>
+      <h3>Точки остановки</h3>
+      <ol style="padding-left:24px">`;
+
+    if (!stops.length) {
+      html += "<li>Дополнительные остановки не требуются.</li>";
+    } else {
+      for (const s of stops) {
+        html += `<li style="margin:8px 0"><b>${s.km.toFixed(0)} км</b> — ${s.title}</li>`;
+      }
+    }
+
+    html += `</ol>
+      <div style="font-size:13px;color:#666">
+        В v0.7.4 точки LPG пока расчётные. В следующей версии подключим реальные АГЗС.
+      </div>`;
+
+    out.innerHTML = html;
+    out.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  // Делегирование событий: работает даже если кнопка создана позже.
+  document.addEventListener("click", function (event) {
+    const btn = event.target.closest("#v074-calc");
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    buildPlan();
+  }, true);
+
+  // На случай, если существующий обработчик был повреждён.
+  window.buildRoadBookPlanV074 = buildPlan;
+})();
+</script>
 </body></html>
 window.addEventListener('load',renderGasStations);
