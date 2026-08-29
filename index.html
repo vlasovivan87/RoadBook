@@ -733,105 +733,7 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
 })();
 </script>
 
-<script>
-/* RoadBook v0.7.6 — unified controls + real LPG stations */
-(function(){
-  const STORE="roadbook_v076_state";
-  const state={
-    fuel: JSON.parse(localStorage.getItem(STORE+"_fuel")||"[]"),
-    consumption: JSON.parse(localStorage.getItem(STORE+"_consumption")||"[]"),
-    stops: JSON.parse(localStorage.getItem(STORE+"_stops")||"[]")
-  };
-  function save(){
-    localStorage.setItem(STORE+"_fuel",JSON.stringify(state.fuel));
-    localStorage.setItem(STORE+"_consumption",JSON.stringify(state.consumption));
-    localStorage.setItem(STORE+"_stops",JSON.stringify(state.stops));
-  }
-  function findButton(t){
-    return t.closest("button,a,[role='button'],input[type='button'],input[type='submit']");
-  }
-  function textOf(el){return (el.innerText||el.value||el.getAttribute("aria-label")||"").trim().toLowerCase()}
-  function form(title,fields,cb){
-    const wrap=document.createElement("div");
-    wrap.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px";
-    const box=document.createElement("div");
-    box.style.cssText="background:#fff;border-radius:14px;padding:18px;max-width:420px;width:100%;font-family:system-ui";
-    let h="<h3 style='margin-top:0'>"+title+"</h3>";
-    fields.forEach((f,i)=>h+=`<label style="display:grid;gap:5px;margin:9px 0">${f.label}<input id="v076f${i}" type="${f.type||"text"}" value="${f.value??""}" step="${f.step||""}" style="padding:9px;border:1px solid #bbb;border-radius:8px"></label>`);
-    h+=`<div style="display:flex;gap:8px;margin-top:14px"><button id="v076ok" style="flex:1;padding:10px">Сохранить</button><button id="v076cancel" style="flex:1;padding:10px">Отмена</button></div>`;
-    box.innerHTML=h; wrap.appendChild(box); document.body.appendChild(wrap);
-    box.querySelector("#v076cancel").onclick=()=>wrap.remove();
-    box.querySelector("#v076ok").onclick=()=>{
-      const vals=fields.map((f,i)=>document.getElementById("v076f"+i).value);
-      wrap.remove(); cb(vals);
-    };
-  }
-  function toast(msg){
-    let x=document.getElementById("v076toast");
-    if(!x){x=document.createElement("div");x.id="v076toast";x.style.cssText="position:fixed;left:16px;right:16px;bottom:20px;z-index:100000;padding:12px;border-radius:10px;background:#222;color:#fff;text-align:center;font-family:system-ui";document.body.appendChild(x)}
-    x.textContent=msg; clearTimeout(x._t); x._t=setTimeout(()=>x.remove(),2600);
-  }
-  function handle(label){
-    if(/заправ/.test(label)){
-      form("⛽ Заправка",[
-        {label:"Пробег, км",type:"number",step:".1"},
-        {label:"Литры LPG",type:"number",step:".1"},
-        {label:"Цена за литр",type:"number",step:".01"}
-      ],v=>{
-        state.fuel.push({date:new Date().toISOString(),odo:+v[0],liters:+v[1],price:+v[2],fuel:"LPG"});
-        save(); toast("Заправка сохранена");
-      });
-      return true;
-    }
-    if(/расход/.test(label)){
-      form("📊 Расход",[
-        {label:"Пробег, км",type:"number",step:".1"},
-        {label:"Израсходовано LPG, л",type:"number",step:".1"}
-      ],v=>{
-        const km=+v[0], liters=+v[1];
-        const avg=km>0?liters/km*100:0;
-        state.consumption.push({date:new Date().toISOString(),km,liters,avg});
-        save(); toast("Расход сохранён: "+avg.toFixed(1)+" л/100 км");
-      });
-      return true;
-    }
-    if(/останов/.test(label)){
-      form("☕ Остановка",[
-        {label:"Пробег, км",type:"number",step:".1"},
-        {label:"Комментарий",value:"Отдых"}
-      ],v=>{
-        state.stops.push({date:new Date().toISOString(),odo:+v[0],note:v[1]});
-        save(); toast("Остановка сохранена");
-      });
-      return true;
-    }
-    return false;
-  }
 
-  document.addEventListener("click",function(e){
-    const b=findButton(e.target); if(!b)return;
-    const label=textOf(b);
-    if(handle(label)){
-      e.preventDefault(); e.stopImmediatePropagation();
-    }
-  },true);
-
-  // Add a compact status panel so saved events are visible.
-  function panel(){
-    if(document.getElementById("v076-events"))return;
-    const p=document.createElement("div");
-    p.id="v076-events";
-    p.style.cssText="margin:12px 0;padding:12px;border:1px solid #ccc;border-radius:12px;background:#fff;font-family:system-ui";
-    p.innerHTML=`<b>📋 Данные поездки</b><br>
-      Заправок: <span id="v076-fc">${state.fuel.length}</span> ·
-      Расходов: <span id="v076-cc">${state.consumption.length}</span> ·
-      Остановок: <span id="v076-sc">${state.stops.length}</span>`;
-    (document.querySelector("main")||document.querySelector("#app")||document.body).appendChild(p);
-  }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(panel,500));
-  else setTimeout(panel,500);
-})();
-</script>
 
 
 
@@ -955,5 +857,26 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
   else setTimeout(addUI,400);
 })();
 </script>
+
+<script>
+/* RoadBook FIX — кнопка «РАСХОД» = только прочие расходы */
+(function(){
+  function bindExpense(){
+    const btn=document.getElementById('expenseBtn');
+    if(!btn)return;
+    btn.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof openForm==='function') openForm('expense');
+    };
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',bindExpense);
+  }else{
+    bindExpense();
+  }
+})();
+</script>
+
 </body></html>
 window.addEventListener('load',renderGasStations);
