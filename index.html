@@ -832,5 +832,96 @@ const plannerBtn=document.getElementById('plannerBtn'); if(plannerBtn)plannerBtn
   else setTimeout(panel,500);
 })();
 </script>
+
+<script>
+/* RoadBook v0.7.7 — независимые рабочие кнопки */
+(function(){
+  const KEY="roadbook_v077_events";
+  function load(){
+    try{return JSON.parse(localStorage.getItem(KEY)||'{"fuel":[],"consumption":[],"stops":[]}')}
+    catch(e){return {fuel:[],consumption:[],stops:[]}}
+  }
+  function save(s){localStorage.setItem(KEY,JSON.stringify(s)); renderCounts(s)}
+
+  function modal(title, fields, done){
+    const shade=document.createElement("div");
+    shade.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:14px";
+    const box=document.createElement("div");
+    box.style.cssText="width:min(430px,100%);background:white;border-radius:16px;padding:18px;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,system-ui";
+    let body="<h3 style='margin:0 0 14px'>"+title+"</h3>";
+    fields.forEach((f,i)=>{
+      body+=`<label style="display:block;margin:10px 0">${f.label}
+        <input id="v077_${i}" type="${f.type||'text'}" value="${f.value||''}" placeholder="${f.placeholder||''}" step="${f.step||''}"
+        style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:11px;border:1px solid #aaa;border-radius:9px;font-size:16px"></label>`;
+    });
+    body+=`<div style="display:flex;gap:8px;margin-top:16px">
+      <button id="v077_save" type="button" style="flex:1;padding:12px;border:0;border-radius:10px">Сохранить</button>
+      <button id="v077_cancel" type="button" style="flex:1;padding:12px;border:1px solid #aaa;border-radius:10px;background:white">Отмена</button>
+    </div>`;
+    box.innerHTML=body; shade.appendChild(box); document.body.appendChild(shade);
+    box.querySelector("#v077_cancel").onclick=()=>shade.remove();
+    box.querySelector("#v077_save").onclick=()=>{
+      const values=fields.map((_,i)=>document.getElementById("v077_"+i).value);
+      shade.remove(); done(values);
+    };
+    const first=box.querySelector("input"); if(first) setTimeout(()=>first.focus(),50);
+  }
+
+  function renderCounts(s){
+    const el=document.getElementById("v077_counts");
+    if(el) el.innerHTML=`Заправок: <b>${s.fuel.length}</b> · Расходов: <b>${s.consumption.length}</b> · Остановок: <b>${s.stops.length}</b>`;
+  }
+
+  function addUI(){
+    if(document.getElementById("v077_controls")) return;
+    const wrap=document.createElement("section");
+    wrap.id="v077_controls";
+    wrap.style.cssText="margin:16px 0;padding:14px;border:1px solid #bbb;border-radius:14px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,system-ui";
+    wrap.innerHTML=`
+      <h3 style="margin:0 0 12px">📋 Управление поездкой</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <button type="button" id="v077_fuel" style="padding:13px 6px;border:1px solid #aaa;border-radius:10px;background:white">⛽ Заправка</button>
+        <button type="button" id="v077_cons" style="padding:13px 6px;border:1px solid #aaa;border-radius:10px;background:white">📊 Расход</button>
+        <button type="button" id="v077_stop" style="padding:13px 6px;border:1px solid #aaa;border-radius:10px;background:white">☕ Остановка</button>
+      </div>
+      <div id="v077_counts" style="margin-top:10px;font-size:13px;color:#555"></div>`;
+    (document.querySelector("main")||document.querySelector("#app")||document.body).appendChild(wrap);
+
+    const s=load(); renderCounts(s);
+
+    document.getElementById("v077_fuel").onclick=function(){
+      modal("⛽ Заправка",[
+        {label:"Пробег, км",type:"number",step:".1"},
+        {label:"Газ LPG, л",type:"number",step:".1"},
+        {label:"Цена за литр, ₽",type:"number",step:".01"}
+      ],v=>{
+        const x=load(); x.fuel.push({date:new Date().toISOString(),odo:+v[0],liters:+v[1],price:+v[2]}); save(x);
+      });
+    };
+
+    document.getElementById("v077_cons").onclick=function(){
+      modal("📊 Расход газа",[
+        {label:"Пробег за расчётный участок, км",type:"number",step:".1"},
+        {label:"Израсходовано газа, л",type:"number",step:".1"}
+      ],v=>{
+        const km=+v[0], liters=+v[1], avg=km>0?liters/km*100:0;
+        const x=load(); x.consumption.push({date:new Date().toISOString(),km,liters,avg}); save(x);
+      });
+    };
+
+    document.getElementById("v077_stop").onclick=function(){
+      modal("☕ Остановка",[
+        {label:"Пробег, км",type:"number",step:".1"},
+        {label:"Комментарий",value:"Отдых"}
+      ],v=>{
+        const x=load(); x.stops.push({date:new Date().toISOString(),odo:+v[0],note:v[1]}); save(x);
+      });
+    };
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>setTimeout(addUI,300));
+  else setTimeout(addUI,300);
+})();
+</script>
 </body></html>
 window.addEventListener('load',renderGasStations);
