@@ -3,169 +3,243 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b3d91">
-<link rel="manifest" href="manifest.webmanifest">
-<title>RoadBook v0.5</title>
+<title>RoadBook v0.5.1</title>
 <style>
-:root{--b:#0b3d91;--g:#0b8f45;--bg:#f5f7fb;--t:#142033;--m:#687386;--l:#e2e7ef}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:var(--t)}
-.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:86px}
-header{background:linear-gradient(145deg,#073274,#1262bf);color:#fff;padding:calc(env(safe-area-inset-top) + 18px) 18px 18px;border-radius:0 0 26px 26px}
-.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:30px;font-weight:800}.status{font-size:13px;background:#08783d;border-radius:18px;padding:7px 11px}.route{font-size:25px;font-weight:800;margin-top:16px}.sub{opacity:.85}
-main{padding:16px}.card{background:#fff;border:1px solid var(--l);border-radius:22px;padding:17px;margin-bottom:14px;box-shadow:0 4px 14px #102a430d}
-.current{display:flex;justify-content:space-between;gap:12px}.pin{font-size:30px}.place{font-size:23px;font-weight:800}.muted{color:var(--m);font-size:14px;margin-top:4px}
-.big{width:100%;border:0;border-radius:19px;padding:18px;background:var(--g);color:#fff;font-size:19px;font-weight:800}.big small{font-weight:500}
-.secondary{width:100%;border:0;border-radius:16px;padding:13px;background:#e8f3ff;color:#0b3d91;font-size:16px;font-weight:800;margin-top:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.action{border:0;border-radius:19px;padding:20px 10px;font-size:17px;font-weight:800;min-height:105px}.action span{display:block;font-size:32px;margin-bottom:8px}.fuel{background:#e6faec}.expense{background:#fff0e7}.stop{background:#e8f3ff}.note{background:#f2eaff}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}.stats b{display:block;font-size:19px;margin-top:5px}.stats small{color:var(--m)}
-.sync{background:#e7faee;color:#075b2f}.sync b{display:block}.sync span{font-size:13px}
-.stage{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--l)}.stage:last-child{border-bottom:0}.stage .n{width:32px;height:32px;border-radius:50%;background:#e8f3ff;color:#0b3d91;display:flex;align-items:center;justify-content:center;font-weight:800}.stage.active .n{background:var(--g);color:#fff}.stage b{display:block}.stage small{color:var(--m)}
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);padding:10px 8px calc(10px + env(safe-area-inset-bottom));background:#ffffffef;backdrop-filter:blur(14px);border-top:1px solid var(--l);display:grid;grid-template-columns:repeat(4,1fr);z-index:10}
-nav button{border:0;background:none;font-size:12px;color:#667085;padding:6px}nav button b{display:block;font-size:22px;margin-bottom:3px}
-.modal-back{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:30}.modal-back.show{display:flex}
-.modal{background:#fff;width:min(520px,100%);border-radius:26px 26px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.modal h2{margin:0 0 16px}
-.field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:13px;border:1px solid var(--l);border-radius:12px;font-size:16px;background:#fff}
-.modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1;padding:14px;border-radius:13px;border:0;font-weight:700;font-size:16px}.save{background:var(--g);color:#fff}.cancel{background:#eef1f5}
-.empty{color:var(--m);text-align:center;padding:20px}
-.fuelbox{background:#f7fbff;border:1px solid #dcecff}.fuelrow{display:flex;justify-content:space-between;padding:8px 0}.fuelrow b{font-size:20px}.fuelbtn{width:100%;border:0;border-radius:14px;padding:12px;background:#e8f3ff;color:#0b3d91;font-weight:800;font-size:15px;margin-top:8px}.fuelwarn{color:#b42318}.fuelok{color:#08783d}</style>
+:root{--g:#08783d;--bg:#f5f6f8;--l:#e5e7eb;--m:#667085}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;padding-bottom:90px}
+.app{width:min(520px,100%);margin:auto;background:#fff;min-height:100vh}
+header{background:#fff;padding:16px 16px 12px;border-bottom:1px solid var(--l)}
+.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:22px;font-weight:800}.status{font-size:12px;font-weight:700;color:var(--g)}
+.route{font-size:19px;font-weight:800;margin-top:8px}.sub{font-size:13px;color:var(--m);margin-top:3px}
+main{padding:12px}.card{background:#fff;border:1px solid var(--l);border-radius:16px;padding:15px;margin-bottom:12px}
+.current{display:flex;justify-content:space-between;gap:10px}.pin{font-size:22px}.place{font-size:20px;font-weight:800}.muted{font-size:13px;color:var(--m);margin-top:3px}
+.current strong{font-size:18px}.big,.secondary{width:100%;border:0;border-radius:15px;padding:15px;margin-bottom:10px;font-weight:800;font-size:16px}.big{background:#0b6e3f;color:#fff}.big small{font-weight:500;opacity:.9}.secondary{background:#eef1f5;color:#182230}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.action{border:0;border-radius:15px;padding:18px 8px;font-weight:800;font-size:14px;background:#f1f3f5}.action span{display:block;font-size:24px;margin-bottom:6px}.fuel{background:#eef7ff}.expense{background:#fff6e8}.stop{background:#f1f8f3}.note{background:#f5f1ff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.stats small{display:block;color:var(--m);font-size:12px}.stats b{display:block;margin-top:5px}
+.sync{display:flex;flex-direction:column;gap:4px}.sync b{font-size:14px}
+.stage{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--l)}.stage:last-child{border-bottom:0}.stage .n{width:30px;height:30px;border-radius:50%;background:#e8f3ff;color:#0b3d91;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 30px}.stage.active .n{background:var(--g);color:#fff}.stage b{display:block}.stage small{color:var(--m)}
+.modal-back{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal-back.show{display:flex}.modal{background:#fff;width:min(520px,100%);border-radius:25px 25px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.modal h2{margin:0 0 14px}.field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:13px;border:1px solid var(--l);border-radius:12px;font-size:16px;background:#fff}.modal-actions{display:flex;gap:10px;margin-top:18px}.modal-actions button{flex:1;padding:14px;border-radius:13px;border:0;font-weight:800;font-size:16px}.save{background:var(--g);color:#fff}.cancel{background:#eef1f5}.empty{color:var(--m);text-align:center;padding:16px}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);padding:9px 8px calc(9px + env(safe-area-inset-bottom));background:#fffffff2;backdrop-filter:blur(12px);border-top:1px solid var(--l);display:grid;grid-template-columns:repeat(4,1fr);z-index:10}nav button{border:0;background:none;font-size:12px;color:#667085;padding:5px}nav button b{display:block;font-size:22px;margin-bottom:2px}
+.route-note{font-size:12px;color:var(--m);background:#f7f8fa;border-radius:10px;padding:10px;margin-top:10px}
+</style>
 </head>
 <body>
 <div class="app">
-<header><div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
-<div class="route">Анапа → Екатеринбург</div><div class="sub">дорожный помощник · v0.5</div></header>
+<header>
+  <div class="top"><div class="brand">🚙 RoadBook</div><div class="status" id="status">🟢 ONLINE</div></div>
+  <div class="route">Анапа → Екатеринбург</div>
+  <div class="sub">дорожный помощник · v0.5.1</div>
+</header>
 <main>
-<section class="card current"><div><div class="pin">📍</div><div class="place" id="nextName">Краснодар</div><div class="muted" id="nextInfo">Следующая точка маршрута</div></div>
-<div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">2 824 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div></section>
+<section class="card current">
+  <div><div class="pin">📍</div><div class="place" id="nextName">Екатеринбург</div><div class="muted" id="nextInfo">Конечная точка маршрута</div></div>
+  <div style="text-align:right"><div class="muted">Осталось</div><strong id="remaining">≈ 2 936 км</strong><div class="muted">Потрачено</div><strong id="spent">0 ₽</strong></div>
+</section>
 
-<button class="big" id="navBtn">🧭 НАВИГАТОР<br><small>Открыть маршрут в Яндекс Навигаторе</small></button>
-<button class="secondary" id="nextBtn">➡️ Следующая точка маршрута</button>
+<button class="big" id="navBtn">🧭 НАВИГАТОР<br><small>Построить маршрут сразу до Екатеринбурга</small></button>
+<button class="secondary" id="nextBtn">➡️ Показать следующий город</button>
 
-<section class="card"><b>🛣 Маршрут поездки</b><div id="stages"></div></section>
+<section class="card">
+  <b>🛣 Маршрут поездки</b>
+  <div id="stages"></div>
+  <div class="route-note">ℹ️ Навигатор получает конечной точкой Екатеринбург. Города в списке — контрольные точки, а не обязательные заезды в центр. Яндекс Навигатор сам выберет актуальную дорогу и объездные участки.</div>
+</section>
 
 <div class="grid">
 <button class="action fuel" id="fuelBtn"><span>⛽</span>ЗАПРАВКА</button>
 <button class="action expense" id="expenseBtn"><span>🍔</span>РАСХОД</button>
 <button class="action stop" id="stopBtn"><span>📍</span>ОСТАНОВКА</button>
-<button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button></div>
+<button class="action note" id="noteBtn"><span>📝</span>ЗАМЕТКА</button>
+</div>
 
-<section class="card fuelbox"><b>⛽ Текущее топливо</b><div class="fuelrow"><span>Газ</span><b id="gasLeft">—</b></div><div class="muted" id="gasRange">После первой полной заправки появится расчёт</div><div class="fuelrow"><span>Бензин</span><b id="petrolLeft">—</b></div><div class="muted" id="petrolRange">Укажи объём при первой заправке</div><div class="muted" id="fuelStatus"></div><button class="fuelbtn" id="fuelStatusBtn">⛽ Внести заправку</button></section><section class="card stats"><div><small>Потрачено</small><b id="spent2">0 ₽</b></div><div><small>План</small><b>39 500 ₽</b></div><div><small>До финиша</small><b id="remaining2">2 824 км</b></div></section>
-<section class="card sync"><b>☁️ Локальное сохранение</b><span id="syncText">Можно записывать расходы без интернета.</span></section>
+<section class="card stats">
+  <div><small>Потрачено</small><b id="spent2">0 ₽</b></div>
+  <div><small>План</small><b>39 500 ₽</b></div>
+  <div><small>До финиша</small><b id="remaining2">≈ 2 936 км</b></div>
+</section>
+
+<section class="card sync"><b>💾 Локальное сохранение</b><span id="syncText">Записи сохраняются на iPhone и доступны без интернета.</span></section>
 <section class="card"><b>📋 Последние записи</b><div id="records" class="empty">Пока записей нет</div></section>
 </main>
-<nav><button id="homeBtn"><b>⌂</b>Главная</button><button id="mapBtn"><b>⌁</b>Навигатор</button><button id="journalBtn"><b>☷</b>Журнал</button><button id="moreBtn"><b>⚙</b>Ещё</button></nav>
+
+<nav>
+<button id="homeBtn"><b>⌂</b>Главная</button>
+<button id="mapBtn"><b>⌁</b>Навигатор</button>
+<button id="journalBtn"><b>☷</b>Журнал</button>
+<button id="moreBtn"><b>⚙</b>Ещё</button>
+</nav>
 </div>
+
 <div class="modal-back" id="modalBack"><div class="modal" id="modal"></div></div>
 
 <script>
 (function(){
 'use strict';
 
-const KEY='roadbook_v05_records';
-const STAGE_KEY='roadbook_v05_stage';
+const KEY='roadbook_v051_records';
+const STAGE_KEY='roadbook_v051_stage';
+
 const stages=[
-  {name:'Краснодар',lat:45.03547,lon:38.97531,km:186},
-  {name:'Кропоткин',lat:45.4375,lon:40.5756,km:170},
-  {name:'Волгоград',lat:48.7080,lon:44.5133,km:650},
-  {name:'Саратов',lat:51.5336,lon:46.0343,km:390},
-  {name:'Самара',lat:53.1959,lon:50.1008,km:430},
-  {name:'Уфа',lat:54.7388,lon:55.9721,km:470},
-  {name:'Челябинск',lat:55.1644,lon:61.4368,km:430},
-  {name:'Екатеринбург',lat:56.8389,lon:60.6057,km:210}
+ {name:'Краснодар',lat:45.03547,lon:38.97531,km:186},
+ {name:'Кропоткин',lat:45.4375,lon:40.5756,km:356},
+ {name:'Волгоград',lat:48.7080,lon:44.5133,km:1006},
+ {name:'Саратов',lat:51.5336,lon:46.0343,km:1396},
+ {name:'Самара',lat:53.1959,lon:50.1008,km:1826},
+ {name:'Уфа',lat:54.7388,lon:55.9721,km:2296},
+ {name:'Челябинск',lat:55.1644,lon:61.4368,km:2726},
+ {name:'Екатеринбург',lat:56.8389,lon:60.6057,km:2936}
 ];
 
-let records=[]; let stage=0;
+let records=[]; let stage=stages.length-1;
 try{records=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){records=[]}
-try{stage=Math.max(0,Math.min(stages.length-1,Number(localStorage.getItem(STAGE_KEY)||0)))}catch(e){stage=0} 
-const FUEL_KEY='roadbook_v06_fuel';
-let fuel={gasLeft:null,petrolLeft:null,gasRate:null,petrolRate:null,lastGasOdo:null,lastPetrolOdo:null,gasTank:35,petrolTank:null};
-try{const x=JSON.parse(localStorage.getItem(FUEL_KEY)||'null');if(x)fuel=Object.assign(fuel,x)}catch(e){}
-function saveFuel(){try{localStorage.setItem(FUEL_KEY,JSON.stringify(fuel))}catch(e){}}
-function fuelRange(left,rate){return left!=null&&rate>0?Math.round(left/rate*100):null}
+try{
+ const saved=Number(localStorage.getItem(STAGE_KEY));
+ if(Number.isFinite(saved)) stage=Math.max(0,Math.min(stages.length-1,saved));
+}catch(e){}
 
+const modalBack=document.getElementById('modalBack');
+const modal=document.getElementById('modal');
 
-const modalBack=document.getElementById('modalBack'), modal=document.getElementById('modal');
 function v(id){const e=document.getElementById(id);return e?(e.value||'').trim():''}
 function n(id){return Number(v(id).replace(',','.'))||0}
-function persist(){try{localStorage.setItem(KEY,JSON.stringify(records));localStorage.setItem(STAGE_KEY,String(stage))}catch(e){}render()}
-function render(){
-  let spent=0; records.forEach(r=>spent+=Number(r.sum||r.amount||0));
-  const s=Math.round(spent).toLocaleString('ru-RU')+' ₽';
-  document.getElementById('spent').textContent=s; document.getElementById('spent2').textContent=s;
-  const st=stages[stage]; document.getElementById('nextName').textContent=st.name;
-  document.getElementById('nextInfo').textContent=stage===stages.length-1?'Финиш маршрута':'Следующая точка · ориентир '+st.km+' км';
-  let rem=stages.slice(stage).reduce((a,x)=>a+x.km,0);
-  document.getElementById('remaining').textContent=rem.toLocaleString('ru-RU')+' км';
-  document.getElementById('remaining2').textContent=rem.toLocaleString('ru-RU')+' км';
-  document.getElementById('syncText').textContent='Записей на iPhone: '+records.length+'. Интернет для ввода не нужен.';
-  document.getElementById('stages').innerHTML=stages.map((x,i)=>'<div class="stage '+(i===stage?'active':'')+'"><div class="n">'+(i+1)+'</div><div><b>'+x.name+(i===stage?' · СЛЕДУЮЩАЯ':'')+'</b><small>ориентир '+x.km+' км</small></div></div>').join('');
-  const gr=fuelRange(fuel.gasLeft,fuel.gasRate), pr=fuelRange(fuel.petrolLeft,fuel.petrolRate);
-  document.getElementById('gasLeft').textContent=fuel.gasLeft==null?'—':fuel.gasLeft.toFixed(1)+' л';
-  document.getElementById('petrolLeft').textContent=fuel.petrolLeft==null?'—':fuel.petrolLeft.toFixed(1)+' л';
-  document.getElementById('gasRange').textContent=gr==null?'После первой полной заправки появится расчёт':'Запас ≈ '+gr+' км · '+fuel.gasRate.toFixed(1)+' л/100 км';
-  document.getElementById('petrolRange').textContent=pr==null?'Укажи объём при первой заправке':'Запас ≈ '+pr+' км · '+fuel.petrolRate.toFixed(1)+' л/100 км';
-  const fs=document.getElementById('fuelStatus');
-  if(gr!=null && gr<st.km){fs.className='muted fuelwarn';fs.textContent='🔴 Расчётного газа может не хватить до следующей точки.'}
-  else if(gr!=null){fs.className='muted fuelok';fs.textContent='🟢 Расчётного газа хватает до следующей точки.'}
-  else fs.className='muted';
-  const box=document.getElementById('records');
-  if(!records.length){box.className='empty';box.textContent='Пока записей нет'}else{
-    box.className='';
-    box.innerHTML=records.slice(0,5).map(r=>{let t=r.type==='fuel'?'⛽ '+r.fuel+' · '+Math.round(r.sum)+' ₽':r.type==='expense'?'🍔 '+r.category+' · '+Math.round(r.amount)+' ₽':r.type==='stop'?'📍 '+r.place:'📝 '+r.comment;return '<div style="padding:11px 0;border-bottom:1px solid var(--l)">'+t+'<div class="muted">'+new Date(r.time).toLocaleString('ru-RU')+'</div></div>'}).join('');
-  }
+
+function persist(){
+ try{
+   localStorage.setItem(KEY,JSON.stringify(records));
+   localStorage.setItem(STAGE_KEY,String(stage));
+ }catch(e){}
+ render();
 }
+
+function render(){
+ let spent=0;
+ records.forEach(r=>spent+=Number(r.sum||r.amount||0));
+ const money=Math.round(spent).toLocaleString('ru-RU')+' ₽';
+ document.getElementById('spent').textContent=money;
+ document.getElementById('spent2').textContent=money;
+
+ const st=stages[stage];
+ document.getElementById('nextName').textContent=st.name;
+ document.getElementById('nextInfo').textContent=stage===stages.length-1?'Конечная точка маршрута':'Контрольная точка · без обязательного заезда в центр';
+
+ const remain=Math.max(0,stages[stages.length-1].km-st.km);
+ const remainText=remain.toLocaleString('ru-RU')+' км';
+ document.getElementById('remaining').textContent=stage===stages.length-1?'0 км':remainText;
+ document.getElementById('remaining2').textContent=stage===stages.length-1?'0 км':remainText;
+
+ document.getElementById('stages').innerHTML=stages.map((x,i)=>{
+   const active=i===stage?' active':'';
+   const done=i<stage?' ✓':'';
+   return '<div class="stage'+active+'"><div class="n">'+(done||String(i+1))+'</div><div><b>'+x.name+'</b><small>'+x.km.toLocaleString('ru-RU')+' км от Анапы</small></div></div>';
+ }).join('');
+
+ const rec=document.getElementById('records');
+ if(!records.length){rec.className='empty';rec.textContent='Пока записей нет'}
+ else{
+   rec.className='';
+   rec.innerHTML=records.slice(0,8).map(r=>{
+     let title=r.type==='fuel'?'⛽ Заправка':r.type==='expense'?'🍔 Расход':r.type==='stop'?'📍 Остановка':'📝 Заметка';
+     let text=r.type==='fuel'?(r.fuel+' · '+r.liters+' л · '+r.price+' ₽/л = '+r.sum+' ₽'):
+              r.type==='expense'?(r.category+' · '+r.amount+' ₽'+(r.comment?' · '+r.comment:'')):
+              r.type==='stop'?(r.place+(r.odo?' · '+r.odo+' км':'')+(r.comment?' · '+r.comment:'')):
+              r.comment;
+     return '<div style="padding:10px 0;border-bottom:1px solid #e5e7eb"><b>'+title+'</b><br><span style="font-size:13px;color:#667085">'+escapeHtml(text)+'</span></div>';
+   }).join('');
+ }
+}
+
+function escapeHtml(s){
+ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
 function openForm(type){
  let title='',body='';
- if(type==='fuel'){title='⛽ Заправка';body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div><div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="35"></div><div class="field"><label>Цена, ₽/л</label><input id="price" inputmode="decimal" placeholder="35,50"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>До заправки закончилось?</label><select id="empty"><option value="unknown">Не знаю</option><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Заправка до полного?</label><select id="full"><option value="yes">Да</option><option value="no">Нет</option></select></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div>'}
- else if(type==='expense'){title='🍔 Новый расход';body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div><div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div><div class="field"><label>Где</label><input id="place" placeholder="АЗС"></div><div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>'}
- else if(type==='stop'){title='📍 Новая остановка';body='<div class="field"><label>Где</label><input id="place" placeholder="Волгоград"></div><div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div><div class="field"><label>Комментарий</label><textarea id="comment" rows="3"></textarea></div>'}
- else{title='📝 Новая заметка';body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>'}
- modal.innerHTML='<h2>'+title+'</h2>'+body+'<div class="modal-actions"><button class="cancel" id="cancelBtn">Отмена</button><button class="save" id="saveBtn">Сохранить</button></div>';
+ if(type==='fuel'){
+   title='⛽ Заправка';
+   body='<div class="field"><label>Топливо</label><select id="fuel"><option>Газ</option><option>Бензин</option></select></div>'+
+        '<div class="field"><label>Литры</label><input id="liters" inputmode="decimal" placeholder="35"></div>'+
+        '<div class="field"><label>Цена за литр, ₽</label><input id="price" inputmode="decimal" placeholder="35.50"></div>'+
+        '<div class="field"><label>Где</label><input id="place" placeholder="АГЗС / АЗС"></div>';
+ }else if(type==='expense'){
+   title='🍔 Расход';
+   body='<div class="field"><label>Категория</label><select id="category"><option>Еда</option><option>Платные дороги</option><option>Прочее</option></select></div>'+
+        '<div class="field"><label>Сумма, ₽</label><input id="amount" inputmode="decimal" placeholder="850"></div>'+
+        '<div class="field"><label>Где</label><input id="place" placeholder="АЗС / кафе"></div>'+
+        '<div class="field"><label>Комментарий</label><input id="comment" placeholder="Завтрак"></div>';
+ }else if(type==='stop'){
+   title='📍 Остановка';
+   body='<div class="field"><label>Где</label><input id="place" placeholder="Волгоград"></div>'+
+        '<div class="field"><label>Пробег, км</label><input id="odo" inputmode="numeric" placeholder="125430"></div>'+
+        '<div class="field"><label>Комментарий</label><textarea id="comment" rows="3" placeholder="Отдых"></textarea></div>';
+ }else{
+   title='📝 Заметка';
+   body='<div class="field"><label>Заметка</label><textarea id="comment" rows="5" placeholder="Например: проверить давление в шинах"></textarea></div>';
+ }
+ modal.innerHTML='<h2>'+title+'</h2>'+body+
+   '<div class="modal-actions"><button class="cancel" id="cancelBtn">Отмена</button><button class="save" id="saveBtn">Сохранить</button></div>';
  modalBack.classList.add('show');
- document.getElementById('cancelBtn').onclick=closeModal; document.getElementById('saveBtn').onclick=function(){submitForm(type)};
+ document.getElementById('cancelBtn').onclick=closeModal;
+ document.getElementById('saveBtn').onclick=function(){submitForm(type)};
 }
+
 function closeModal(){modalBack.classList.remove('show');modal.innerHTML=''}
+
 function submitForm(type){
  let r={type:type,time:new Date().toISOString()};
  if(type==='fuel'){
-r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place');r.odo=n('odo');r.empty=v('empty');r.full=v('full');
-const gas=r.fuel==='Газ'; const oldOdo=gas?fuel.lastGasOdo:fuel.lastPetrolOdo;
-if(r.odo>0 && oldOdo!=null && r.odo>oldOdo && r.empty==='yes'){
- const rate=r.liters/(r.odo-oldOdo)*100;
- if(rate>3&&rate<30){if(gas)fuel.gasRate=rate;else fuel.petrolRate=rate}
-}
-if(r.odo>0){if(gas)fuel.lastGasOdo=r.odo;else fuel.lastPetrolOdo=r.odo}
-if(gas){fuel.gasLeft=(r.full==='yes')?Math.min(35,r.liters):Math.min(35,(fuel.gasLeft||0)+r.liters);if(r.empty==='yes'&&r.full!=='yes')fuel.gasLeft=r.liters}
-else{if(r.full==='yes'){fuel.petrolTank=r.liters;fuel.petrolLeft=r.liters}else fuel.petrolLeft=(fuel.petrolLeft||0)+r.liters}
-saveFuel();
-}
- if(type==='expense'){r.category=v('category');r.amount=n('amount');r.place=v('place');r.comment=v('comment')}
- if(type==='stop'){r.place=v('place');r.odo=n('odo');r.comment=v('comment')}
+   r.fuel=v('fuel');r.liters=n('liters');r.price=n('price');r.sum=r.liters*r.price;r.place=v('place');
+ }
+ if(type==='expense'){
+   r.category=v('category');r.amount=n('amount');r.place=v('place');r.comment=v('comment');
+ }
+ if(type==='stop'){
+   r.place=v('place');r.odo=n('odo');r.comment=v('comment');
+ }
  if(type==='note')r.comment=v('comment');
+
+ if(type==='fuel' && (!r.liters || !r.price)){alert('Укажи литры и цену за литр.');return}
+ if(type==='expense' && !r.amount){alert('Укажи сумму.');return}
+ if(type==='note' && !r.comment){alert('Напиши заметку.');return}
+
  records.unshift(r);persist();closeModal();
 }
+
 function openNavigator(){
-  const s=stages[stage];
-  // Яндекс Навигатор строит маршрут от текущего местоположения
-  // до выбранной следующей точки. Никакого перехода в Карты
-  // после запуска больше нет.
-  const url='yandexnavi://build_route_on_map?lat_to='+encodeURIComponent(s.lat)+'&lon_to='+encodeURIComponent(s.lon);
-  window.location.href=url;
+ // v0.5.1: всегда строим один маршрут Анапа → Екатеринбург.
+ // Контрольные города НЕ передаются как обязательные точки маршрута.
+ const url='yandexnavi://build_route_on_map?lat_to='+encodeURIComponent(56.8389)+'&lon_to='+encodeURIComponent(60.6057);
+ window.location.href=url;
 }
+
 document.getElementById('navBtn').onclick=openNavigator;
-document.getElementById('fuelStatusBtn').onclick=function(){openForm('fuel')};
 document.getElementById('mapBtn').onclick=openNavigator;
-document.getElementById('nextBtn').onclick=function(){if(stage<stages.length-1){stage++;persist()}};
+
+document.getElementById('nextBtn').onclick=function(){
+ if(stage<stages.length-1){stage++;persist()}
+ else{stage=0;persist()}
+};
+
 document.getElementById('fuelBtn').onclick=function(){openForm('fuel')};
 document.getElementById('expenseBtn').onclick=function(){openForm('expense')};
 document.getElementById('stopBtn').onclick=function(){openForm('stop')};
 document.getElementById('noteBtn').onclick=function(){openForm('note')};
-document.getElementById('journalBtn').onclick=function(){document.getElementById('records').scrollIntoView({behavior:'smooth'})};
-document.getElementById('homeBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
-document.getElementById('moreBtn').onclick=function(){alert('RoadBook v0.5\\n\\nНавигатор: Яндекс Навигатор.\\nДанные: локально на iPhone.\\nСледующий этап: синхронизация и точный маршрут.')};
+
+document.getElementById('journalBtn').onclick=function(){
+ document.getElementById('records').scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('homeBtn').onclick=function(){
+ window.scrollTo({top:0,behavior:'smooth'});
+};
+document.getElementById('moreBtn').onclick=function(){
+ alert('RoadBook v0.5.1\\n\\nНавигатор: маршрут сразу до Екатеринбурга.\\nКонтрольные города не являются обязательными заездами.\\nДанные: локально на iPhone.');
+};
+
 modalBack.onclick=function(e){if(e.target===modalBack)closeModal()};
 addEventListener('online',function(){document.getElementById('status').textContent='🟢 ONLINE'});
 addEventListener('offline',function(){document.getElementById('status').textContent='🔴 OFFLINE'});
+
 render();
 })();
 </script>
-</body></html>
+</body>
+</html>
